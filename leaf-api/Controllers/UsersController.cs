@@ -81,7 +81,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [RequirePermission("users:write")]
-        public async Task<ActionResult<Provider>> CreateUser(UserRequest request)
+        public async Task<ActionResult> CreateUser(UserRequest request)
         {
             var roleExists = await context.Roles.AnyAsync(r => r.Id == request.RoleId);
             if (!roleExists)

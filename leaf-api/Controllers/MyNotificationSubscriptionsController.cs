@@ -11,15 +11,14 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class MyNotificationSubscriptionsController(DataContext context) : ControllerBase
 {
-    [HttpGet]
-    public async Task<List<string>> GetMySubscriptions()
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        if (email is null) return [];
+    //[HttpGet]
+    //public async Task<List<string>> GetMySubscriptions()
+    //{
+    //    var email = User.FindFirstValue(ClaimTypes.Email);
+    //    if (email is null) return [];
 
-        return await context.ProviderNotificationSubscriptions
-            .Where(s => s.UserEmail == email)
-            .Select(s => s.ProviderSlug)
-            .ToListAsync();
-    }
+    //    return await context.NotificationSubscriptions
+    //        .Where(s => s.UserEmail == email)
+    //        .ToListAsync();
+    //}
 }

@@ -4,7 +4,6 @@ using WebAPI.Configuration;
 using WebAPI.Data;
 using WebAPI.Errors;
 using WebAPI.Interfaces;
-using WebAPI.Jobs;
 using WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -70,9 +69,9 @@ namespace LogosAPI
                     .UseRecommendedSerializerSettings()
                     .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(dbConnectrionString)));
             builder.Services.AddHangfireServer();
-            builder.Services.AddScoped<InsuranceAuthExpiredJob>();
-            builder.Services.AddScoped<InsuranceAuthAboutToExpireJob>();
-            builder.Services.AddScoped<SendProviderNotificationsJob>();
+            //builder.Services.AddScoped<InsuranceAuthExpiredJob>();
+            //builder.Services.AddScoped<InsuranceAuthAboutToExpireJob>();
+            //builder.Services.AddScoped<SendProviderNotificationsJob>();
 
             var jwtSettings = builder.Configuration.GetSection(nameof(JWTOptions)).Get<JWTOptions>()!;
             
@@ -142,18 +141,18 @@ namespace LogosAPI
 
             app.UseHangfireDashboard("/hangfire");
 
-            RecurringJob.AddOrUpdate<InsuranceAuthExpiredJob>(
-                "insurance-auth-expired",
-                job => job.ExecuteAsync(),
-                "0 9 * * *");
-            RecurringJob.AddOrUpdate<InsuranceAuthAboutToExpireJob>(
-                "insurance-auth-about-to-expire",
-                job => job.ExecuteAsync(),
-                "0 9 * * *");
-            RecurringJob.AddOrUpdate<SendProviderNotificationsJob>(
-                "send-provider-notifications",
-                job => job.ExecuteAsync(),
-                "12 9 * * *");
+            //RecurringJob.AddOrUpdate<InsuranceAuthExpiredJob>(
+            //    "insurance-auth-expired",
+            //    job => job.ExecuteAsync(),
+            //    "0 9 * * *");
+            //RecurringJob.AddOrUpdate<InsuranceAuthAboutToExpireJob>(
+            //    "insurance-auth-about-to-expire",
+            //    job => job.ExecuteAsync(),
+            //    "0 9 * * *");
+            //RecurringJob.AddOrUpdate<SendProviderNotificationsJob>(
+            //    "send-provider-notifications",
+            //    job => job.ExecuteAsync(),
+            //    "12 9 * * *");
 
             app.MapControllers();
 

@@ -11,7 +11,7 @@ namespace WebAPI.Controllers;
 [Authorize]
 [Route("api/providers/{providerSlug}/notification-subscriptions")]
 [ApiController]
-public class ProviderNotificationSubscriptionsController(DataContext context) : ControllerBase
+public class NotificationSubscriptionsController(DataContext context) : ControllerBase
 {
     [HttpPost]
     [RequireProviderPermission(".notifications:read")]
@@ -20,15 +20,14 @@ public class ProviderNotificationSubscriptionsController(DataContext context) : 
         var email = User.FindFirstValue(ClaimTypes.Email);
         if (email is null) return Unauthorized();
 
-        var exists = await context.ProviderNotificationSubscriptions
-            .AnyAsync(s => s.UserEmail == email && s.ProviderSlug == providerSlug);
+        var exists = await context.NotificationSubscriptions
+            .AnyAsync(s => s.UserEmail == email);
 
         if (exists) return Conflict();
 
-        context.ProviderNotificationSubscriptions.Add(new ProviderNotificationSubscription
+        context.NotificationSubscriptions.Add(new NotificationSubscription
         {
             UserEmail = email,
-            ProviderSlug = providerSlug
         });
 
         await context.SaveChangesAsync();
@@ -42,12 +41,12 @@ public class ProviderNotificationSubscriptionsController(DataContext context) : 
         var email = User.FindFirstValue(ClaimTypes.Email);
         if (email is null) return Unauthorized();
 
-        var subscription = await context.ProviderNotificationSubscriptions
-            .FirstOrDefaultAsync(s => s.UserEmail == email && s.ProviderSlug == providerSlug);
+        var subscription = await context.NotificationSubscriptions
+            .FirstOrDefaultAsync(s => s.UserEmail == email);
 
         if (subscription is not null)
         {
-            context.ProviderNotificationSubscriptions.Remove(subscription);
+            context.NotificationSubscriptions.Remove(subscription);
             await context.SaveChangesAsync();
         }
 
