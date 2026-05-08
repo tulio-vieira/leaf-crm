@@ -1,28 +1,11 @@
-import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import type { Provider } from '../models/Domain'
-import { listProviders } from '../services/providerService'
 import NotificationList from '../components/NotificationList'
 import QueryFilters, { type FilterItem } from '../components/QueryFilters'
 
 function NotificationsScreen() {
-  const [providers, setProviders] = useState<Provider[]>([])
-
-  useEffect(() => {
-    listProviders(1).then(res => {
-      if (res.data) setProviders(res.data.items)
-    })
-  }, [])
-
   const filterItems: FilterItem[] = [
-    {
-      queryParam: 'providerSlug',
-      inputType: 'dropdown',
-      displayName: 'Clínica',
-      availableOptions: providers.map(p => ({ displayName: p.name, value: p.slug })),
-    },
     {
       queryParam: 'acknowledged',
       inputType: 'dropdown',

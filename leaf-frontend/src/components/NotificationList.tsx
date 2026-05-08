@@ -33,9 +33,9 @@ function NotificationList() {
     })
   }, [searchParams])
 
-  async function handleDelete(providerSlug: string, id: number) {
+  async function handleDelete(id: number) {
     setActionError(null)
-    const res = await deleteNotification(providerSlug, id)
+    const res = await deleteNotification(id)
     if (res.errMsg) {
       setActionError(res.errMsg)
       return
@@ -43,9 +43,9 @@ function NotificationList() {
     setPagedData(prev => prev ? { ...prev, items: prev.items.filter(n => n.id !== id) } : prev)
   }
 
-  async function handleAcknowledge(providerSlug: string, id: number) {
+  async function handleAcknowledge(id: number) {
     setActionError(null)
-    const res = await acknowledgeNotification(providerSlug, id)
+    const res = await acknowledgeNotification(id)
     if (res.errMsg) {
       setActionError(res.errMsg)
       return
@@ -73,7 +73,7 @@ function NotificationList() {
         <Accordion key={notification.id}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mr: 1 }}>
-              <Chip label={notification.providerSlug} size="small" variant="outlined" />
+              <Chip size="small" variant="outlined" />
               {notification.acknowledgedByUserEmail
                 ? <Chip label="Confirmada" color="success" size="small" />
                 : <Chip label="Não lida" color="warning" size="small" />}
@@ -98,7 +98,7 @@ function NotificationList() {
                   size="small"
                   variant="outlined"
                   color="success"
-                  onClick={() => handleAcknowledge(notification.providerSlug, notification.id)}
+                  onClick={() => handleAcknowledge(notification.id)}
                 >
                   Confirmar
                 </Button>
@@ -107,7 +107,7 @@ function NotificationList() {
                 size="small"
                 variant="outlined"
                 color="error"
-                onClick={() => handleDelete(notification.providerSlug, notification.id)}
+                onClick={() => handleDelete(notification.id)}
               >
                 Excluir
               </Button>

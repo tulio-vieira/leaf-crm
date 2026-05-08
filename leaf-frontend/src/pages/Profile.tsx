@@ -5,16 +5,12 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
-import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 import { backendAPI } from '../services/backendService'
-import { listAllowedProviders } from '../services/providerService'
-import { getMySubscriptions, subscribe, unsubscribe } from '../services/notificationSubscriptionService'
+// import { subscribe, unsubscribe } from '../services/notificationSubscriptionService'
 import type { PageState } from '../models/PageState'
 import type { ProfileResponse } from '../models/User'
-import type { Provider } from '../models/Domain'
 
 function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
@@ -29,49 +25,48 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
 
 const ProfilePage = () => {
   const [pageState, setPageState] = useState<PageState<ProfileResponse>>({ isLoading: true })
-  const [providers, setProviders] = useState<Provider[]>([])
-  const [subscribedSlugs, setSubscribedSlugs] = useState<Set<string>>(new Set())
-  const [subscriptionsLoading, setSubscriptionsLoading] = useState(true)
-  const [subscriptionsError, setSubscriptionsError] = useState<string | null>(null)
-  const [toggleErrors, setToggleErrors] = useState<Record<string, string>>({})
+  // const [subscribedSlugs, setSubscribedSlugs] = useState<Set<string>>(new Set())
+  // const [subscriptionsLoading, setSubscriptionsLoading] = useState(true)
+  // const [subscriptionsError, setSubscriptionsError] = useState<string | null>(null)
+  // const [toggleErrors, setToggleErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     backendAPI.getMyProfile().then(res => setPageState(res))
 
-    Promise.all([listAllowedProviders(), getMySubscriptions()]).then(([providersRes, subsRes]) => {
-      if (providersRes.data) setProviders(providersRes.data)
-      else setSubscriptionsError(providersRes.errMsg ?? 'Erro ao carregar clínicas.')
+    // Promise.all([listAllowedProviders(), getMySubscriptions()]).then(([providersRes, subsRes]) => {
+    //   if (providersRes.data) setProviders(providersRes.data)
+    //   else setSubscriptionsError(providersRes.errMsg ?? 'Erro ao carregar clínicas.')
 
-      if (subsRes.data) setSubscribedSlugs(new Set(subsRes.data))
-      else setSubscriptionsError(subsRes.errMsg ?? 'Erro ao carregar inscrições.')
+    //   if (subsRes.data) setSubscribedSlugs(new Set(subsRes.data))
+    //   else setSubscriptionsError(subsRes.errMsg ?? 'Erro ao carregar inscrições.')
 
-      setSubscriptionsLoading(false)
-    })
+    //   setSubscriptionsLoading(false)
+    // })
   }, [])
 
-  const handleToggle = async (slug: string, checked: boolean) => {
-    setToggleErrors(prev => ({ ...prev, [slug]: '' }))
-    const wasSubscribed = subscribedSlugs.has(slug)
+  // const handleToggle = async (slug: string, checked: boolean) => {
+  //   setToggleErrors(prev => ({ ...prev, [slug]: '' }))
+  //   const wasSubscribed = subscribedSlugs.has(slug)
 
-    setSubscribedSlugs(prev => {
-      const next = new Set(prev)
-      if (checked) next.add(slug)
-      else next.delete(slug)
-      return next
-    })
+  //   setSubscribedSlugs(prev => {
+  //     const next = new Set(prev)
+  //     if (checked) next.add(slug)
+  //     else next.delete(slug)
+  //     return next
+  //   })
 
-    const res = checked ? await subscribe(slug) : await unsubscribe(slug)
+  //   const res = checked ? await subscribe(slug) : await unsubscribe(slug)
 
-    if (res.errMsg) {
-      setSubscribedSlugs(prev => {
-        const next = new Set(prev)
-        if (wasSubscribed) next.add(slug)
-        else next.delete(slug)
-        return next
-      })
-      setToggleErrors(prev => ({ ...prev, [slug]: res.errMsg! }))
-    }
-  }
+  //   if (res.errMsg) {
+  //     setSubscribedSlugs(prev => {
+  //       const next = new Set(prev)
+  //       if (wasSubscribed) next.add(slug)
+  //       else next.delete(slug)
+  //       return next
+  //     })
+  //     setToggleErrors(prev => ({ ...prev, [slug]: res.errMsg! }))
+  //   }
+  // }
 
   return (
     <Box>
@@ -98,7 +93,7 @@ const ProfilePage = () => {
         Receba notificações por e-mail sobre as clínicas selecionadas.
       </Typography>
 
-      {subscriptionsLoading && <CircularProgress size={24} />}
+      {/* {subscriptionsLoading && <CircularProgress size={24} />}
       {subscriptionsError && <Alert severity="error">{subscriptionsError}</Alert>}
 
       {!subscriptionsLoading && !subscriptionsError && (
@@ -129,7 +124,7 @@ const ProfilePage = () => {
               </CardContent>
             </Card>
           )
-      )}
+      )} */}
     </Box>
   )
 }

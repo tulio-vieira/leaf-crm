@@ -1,4 +1,3 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { ThemeProvider } from '@mui/material/styles'
