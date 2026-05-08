@@ -1,6 +1,6 @@
-//using LogosAPI.Dtos;
+//using WebAPI.Dtos;
 
-//namespace LogosAPI.Models;
+//namespace WebAPI.Models;
 
 //public class TreatmentSessionSnapshot: UpdateTreatmentSessionRequest
 //{

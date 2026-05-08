@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
-using LogosAPI.Configuration;
-using LogosAPI.Data;
-using LogosAPI.Dtos.Auth;
-using LogosAPI.Errors;
-using LogosAPI.Interfaces;
-using LogosAPI.Services;
+using WebAPI.Configuration;
+using WebAPI.Data;
+using WebAPI.Dtos.Auth;
+using WebAPI.Errors;
+using WebAPI.Interfaces;
+using WebAPI.Services;
 using Microsoft.Extensions.Options;
 
 namespace JwtAuthDotNet9.Controllers

@@ -1,4 +1,4 @@
-﻿namespace LogosAPI.Errors
+﻿namespace WebAPI.Errors
 {
     public class ServiceException : Exception
     {

@@ -17,7 +17,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center">
           {/* TODO: add page title from env variable here */}
-          <h1 className="text-xl dark:text-gray-100">Logos</h1>
+          <h1 className="text-xl dark:text-gray-100">Leaf CRM</h1>
         </div>
         <nav className="flex items-center">
           <ul className="flex space-x-2 mr-2">

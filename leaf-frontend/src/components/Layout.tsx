@@ -79,7 +79,7 @@ export default function Layout({ children }: Props) {
             to="/"
             sx={{ flexGrow: 1, color: 'inherit', textDecoration: 'none', fontWeight: 700, letterSpacing: 0.5 }}
           >
-            Logos
+            Leaf CRM
           </Typography>
 
           {isAuthenticated ? (
@@ -99,7 +99,7 @@ export default function Layout({ children }: Props) {
         <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
           <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <LocalHospitalIcon color="primary" />
-            <Typography variant="h6" sx={{fontWeight: 700}}>Logos</Typography>
+            <Typography variant="h6" sx={{fontWeight: 700}}>Leaf CRM</Typography>
           </Box>
           <Divider />
           <List>
@@ -131,7 +131,7 @@ export default function Layout({ children }: Props) {
         }}
       >
         <Typography variant="body2">
-          © {new Date().getFullYear()} Logos. Todos os direitos reservados.
+          © {new Date().getFullYear()} Leaf CRM. Todos os direitos reservados.
         </Typography>
       </Box>
     </Box>

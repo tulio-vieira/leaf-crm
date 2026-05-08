@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
-namespace LogosAPI.Errors
+namespace WebAPI.Errors
 {
     public class ProblemExceptionHandler : IExceptionHandler
     {

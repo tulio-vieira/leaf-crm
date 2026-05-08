@@ -1,8 +1,8 @@
-﻿using LogosAPI.Dtos;
+﻿using WebAPI.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace LogosAPI.Models
+namespace WebAPI.Models
 {
 
     [Index(nameof(Email), IsUnique = true)]

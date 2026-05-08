@@ -1,15 +1,15 @@
-using LogosAPI.Authorization;
-using LogosAPI.Configuration;
-using LogosAPI.Data;
-using LogosAPI.Dtos;
-using LogosAPI.Errors;
-using LogosAPI.Models;
+using WebAPI.Authorization;
+using WebAPI.Configuration;
+using WebAPI.Data;
+using WebAPI.Dtos;
+using WebAPI.Errors;
+using WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace LogosAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Authorize]
     [Route("api/providers/{providerSlug}/patients")]

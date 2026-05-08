@@ -1,4 +1,4 @@
-﻿namespace LogosAPI.Dtos.Auth
+﻿namespace WebAPI.Dtos.Auth
 {
     public class RefreshTokenRequest
     {

@@ -1,6 +1,6 @@
-﻿using LogosAPI.Models;
+﻿using WebAPI.Models;
 
-namespace LogosAPI.Interfaces
+namespace WebAPI.Interfaces
 {
     public interface ITokenService
     {

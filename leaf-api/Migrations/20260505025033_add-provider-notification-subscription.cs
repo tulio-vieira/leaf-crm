@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace LogosAPI.Migrations
+namespace WebAPI.Migrations
 {
     /// <inheritdoc />
     public partial class addprovidernotificationsubscription : Migration

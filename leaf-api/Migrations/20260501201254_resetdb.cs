@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace LogosAPI.Migrations
+namespace WebAPI.Migrations
 {
     /// <inheritdoc />
     public partial class resetdb : Migration

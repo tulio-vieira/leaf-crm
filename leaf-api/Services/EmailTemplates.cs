@@ -1,4 +1,4 @@
-namespace LogosAPI.Services
+namespace WebAPI.Services
 {
     public static class EmailTemplates
     {
@@ -26,13 +26,13 @@ namespace LogosAPI.Services
               <div class="wrapper">
                 <div class="container">
                   <div class="header">
-                    <h1>LOGOS</h1>
+                    <h1>Leaf CRM</h1>
                   </div>
                   <div class="body">
                     {{bodyContent}}
                   </div>
                   <div class="footer">
-                    <p>Você recebeu este e-mail porque uma ação foi solicitada na plataforma Logos.<br />Se você não realizou esta ação, pode ignorar esta mensagem com segurança.</p>
+                    <p>Você recebeu este e-mail porque uma ação foi solicitada na plataforma Leaf CRM.<br />Se você não realizou esta ação, pode ignorar esta mensagem com segurança.</p>
                   </div>
                 </div>
               </div>
@@ -41,10 +41,10 @@ namespace LogosAPI.Services
             """;
 
         public static string AccountCreated(string validateUrl) => Layout(
-            "Validação de E-mail — Logos",
+            "Validação de E-mail — Leaf CRM",
             $"""
             <p>Olá,</p>
-            <p>Sua conta na plataforma <strong>Logos</strong> foi criada com sucesso.</p>
+            <p>Sua conta na plataforma <strong>Leaf CRM</strong> foi criada com sucesso.</p>
             <p>Para ativar sua conta, clique no botão abaixo para validar o seu e-mail:</p>
             <p><a class="btn" href="{validateUrl}">Validar E-mail</a></p>
             <p>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</p>
@@ -54,10 +54,10 @@ namespace LogosAPI.Services
         );
 
         public static string PasswordResetRequest(string resetUrl) => Layout(
-            "Redefinição de Senha — Logos",
+            "Redefinição de Senha — Leaf CRM",
             $"""
             <p>Olá,</p>
-            <p>Recebemos uma solicitação para redefinir a senha da sua conta na plataforma <strong>Logos</strong>.</p>
+            <p>Recebemos uma solicitação para redefinir a senha da sua conta na plataforma <strong>Leaf CRM</strong>.</p>
             <p>Clique no botão abaixo para criar uma nova senha:</p>
             <p><a class="btn" href="{resetUrl}">Redefinir Senha</a></p>
             <p>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</p>
@@ -67,10 +67,10 @@ namespace LogosAPI.Services
         );
 
         public static string ProviderNotification(string notificationMessage) => Layout(
-            "Nova Notificação — Logos",
+            "Nova Notificação — Leaf CRM",
             $"""
             <p>Olá,</p>
-            <p>Você recebeu uma nova notificação na plataforma <strong>Logos</strong>:</p>
+            <p>Você recebeu uma nova notificação na plataforma <strong>Leaf CRM</strong>:</p>
             <p>{notificationMessage}</p>
             """
         );

@@ -1,6 +1,6 @@
-﻿using LogosAPI.Interfaces;
+﻿using WebAPI.Interfaces;
 
-namespace LogosAPI.Services
+namespace WebAPI.Services
 {
     public class NotificationLoggerService(
         ILogger<NotificationLoggerService> logger,

@@ -1,9 +1,9 @@
-using LogosAPI.Data;
-using LogosAPI.Errors;
+using WebAPI.Data;
+using WebAPI.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace LogosAPI.Models;
+namespace WebAPI.Models;
 
 public class InsuranceAuthorization
 {

@@ -1,4 +1,4 @@
-namespace LogosAPI.Models;
+namespace WebAPI.Models;
 
 public class Insurance
 {

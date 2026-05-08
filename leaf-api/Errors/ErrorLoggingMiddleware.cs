@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace LogosAPI.Errors
+namespace WebAPI.Errors
 {
     public class ErrorLoggingMiddleware(RequestDelegate next, ILogger<ErrorLoggingMiddleware> logger)
     {

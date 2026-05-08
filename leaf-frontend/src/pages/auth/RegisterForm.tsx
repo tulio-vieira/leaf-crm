@@ -44,7 +44,7 @@ export default function RegisterForm() {
       <Paper elevation={2} sx={{ p: 4, maxWidth: 420, width: '100%' }}>
         <Typography variant="h5" gutterBottom>Criar conta</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Junte-se ao Logos
+          Junte-se ao Leaf CRM
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>

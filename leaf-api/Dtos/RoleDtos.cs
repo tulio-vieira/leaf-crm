@@ -1,6 +1,6 @@
-using LogosAPI.Models;
+using WebAPI.Models;
 
-namespace LogosAPI.Dtos
+namespace WebAPI.Dtos
 {
     public class RoleRequest
     {

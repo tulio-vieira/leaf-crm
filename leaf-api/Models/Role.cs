@@ -1,9 +1,9 @@
 
-using LogosAPI.Dtos;
+using WebAPI.Dtos;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace LogosAPI.Models
+namespace WebAPI.Models
 {
     public partial class Role
     {

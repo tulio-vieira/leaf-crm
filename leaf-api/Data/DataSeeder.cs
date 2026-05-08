@@ -1,7 +1,7 @@
-using LogosAPI.Models;
+using WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LogosAPI.Data;
+namespace WebAPI.Data;
 
 public class DataSeeder(DataContext context)
 {

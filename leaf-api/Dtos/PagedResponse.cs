@@ -1,4 +1,4 @@
-namespace LogosAPI.Dtos;
+namespace WebAPI.Dtos;
 
 public class PagedResponse<T>
 {

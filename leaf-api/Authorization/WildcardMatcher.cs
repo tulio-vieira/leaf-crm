@@ -1,4 +1,4 @@
-//namespace LogosAPI.Authorization
+//namespace WebAPI.Authorization
 //{
 //    public static class WildcardMatcher
 //    {

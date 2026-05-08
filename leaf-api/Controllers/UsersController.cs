@@ -1,18 +1,18 @@
-using LogosAPI.Authorization;
-using LogosAPI.Configuration;
-using LogosAPI.Data;
-using LogosAPI.Dtos;
-using LogosAPI.Errors;
-using LogosAPI.Interfaces;
-using LogosAPI.Models;
-using LogosAPI.Services;
+using WebAPI.Authorization;
+using WebAPI.Configuration;
+using WebAPI.Data;
+using WebAPI.Dtos;
+using WebAPI.Errors;
+using WebAPI.Interfaces;
+using WebAPI.Models;
+using WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace LogosAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

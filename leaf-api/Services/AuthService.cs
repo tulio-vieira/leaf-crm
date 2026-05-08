@@ -7,13 +7,13 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using LogosAPI.Configuration;
-using LogosAPI.Data;
-using LogosAPI.Dtos.Auth;
-using LogosAPI.Errors;
-using LogosAPI.Models;
+using WebAPI.Configuration;
+using WebAPI.Data;
+using WebAPI.Dtos.Auth;
+using WebAPI.Errors;
+using WebAPI.Models;
 
-namespace LogosAPI.Services
+namespace WebAPI.Services
 {
     public class AuthService(
         DataContext context,

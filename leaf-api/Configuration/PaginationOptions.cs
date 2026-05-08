@@ -1,4 +1,4 @@
-namespace LogosAPI.Configuration
+namespace WebAPI.Configuration
 {
     public class PaginationOptions
     {

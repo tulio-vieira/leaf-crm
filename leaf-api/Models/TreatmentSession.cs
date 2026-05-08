@@ -1,7 +1,7 @@
-using LogosAPI.Data;
-using LogosAPI.Errors;
+using WebAPI.Data;
+using WebAPI.Errors;
 
-namespace LogosAPI.Models;
+namespace WebAPI.Models;
 
 public class TreatmentSession
 {

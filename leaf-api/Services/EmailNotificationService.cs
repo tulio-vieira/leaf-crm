@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
 using System.Text;
-using LogosAPI.Interfaces;
+using WebAPI.Interfaces;
 
-namespace LogosAPI.Services
+namespace WebAPI.Services
 {
     public class EmailNotificationService(
         IHttpClientFactory httpClientFactory,
@@ -12,8 +12,8 @@ namespace LogosAPI.Services
     {
         private string ApiKey => config.GetValue<string>("MailGunOptions:ApiKey") ?? throw new InvalidOperationException("MailGunOptions:ApiKey is not configured.");
         private string Domain => config.GetValue<string>("MailGunOptions:Domain") ?? throw new InvalidOperationException("MailGunOptions:Domain is not configured.");
-        private string FromEmail => config.GetValue<string>("MailGunOptions:FromEmail") ?? "noreply@logos.com";
-        private string FromName => config.GetValue<string>("MailGunOptions:FromName") ?? "Logos";
+        private string FromEmail => config.GetValue<string>("MailGunOptions:FromEmail") ?? "noreply@leaf CRM.com";
+        private string FromName => config.GetValue<string>("MailGunOptions:FromName") ?? "Leaf CRM";
         private string AdminEmail => config.GetValue<string>("MailGunOptions:AdminEmail") ?? throw new InvalidOperationException("MailGunOptions:AdminEmail is not configured.");
         private string FrontendUrl => config.GetValue<string>("FrontendUrl") ?? throw new InvalidOperationException("FrontendUrl is not configured.");
 
@@ -21,26 +21,26 @@ namespace LogosAPI.Services
         {
             var validateUrl = $"{FrontendUrl}/auth/validate-email?token={token}";
             var html = EmailTemplates.AccountCreated(validateUrl);
-            await SendEmailAsync(email, "Validação de E-mail — Logos", html);
+            await SendEmailAsync(email, "Validação de E-mail — Leaf CRM", html);
         }
 
         public async Task NotifyPasswordResetRequest(string email, string token)
         {
             var resetUrl = $"{FrontendUrl}/auth/reset-password?token={token}&email={email}";
             var html = EmailTemplates.PasswordResetRequest(resetUrl);
-            await SendEmailAsync(email, "Redefinição de Senha — Logos", html);
+            await SendEmailAsync(email, "Redefinição de Senha — Leaf CRM", html);
         }
 
         public async Task SendMessage(string message)
         {
             var html = $"<p>{message}</p>";
-            await SendEmailAsync(AdminEmail, "Mensagem do Sistema — Logos", html);
+            await SendEmailAsync(AdminEmail, "Mensagem do Sistema — Leaf CRM", html);
         }
 
         public async Task NotifyProviderNotification(string email, string notificationMessage)
         {
             var html = EmailTemplates.ProviderNotification(notificationMessage);
-            await SendEmailAsync(email, "Nova Notificação — Logos", html);
+            await SendEmailAsync(email, "Nova Notificação — Leaf CRM", html);
         }
 
         private async Task SendEmailAsync(string to, string subject, string html)

@@ -1,10 +1,10 @@
 using Hangfire;
-using LogosAPI.Data;
-using LogosAPI.Interfaces;
-using LogosAPI.Models;
+using WebAPI.Data;
+using WebAPI.Interfaces;
+using WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LogosAPI.Jobs;
+namespace WebAPI.Jobs;
 
 [DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
 public class SendProviderNotificationsJob(

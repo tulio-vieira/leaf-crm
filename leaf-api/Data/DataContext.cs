@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using LogosAPI.Models;
+using WebAPI.Models;
 
-namespace LogosAPI.Data
+namespace WebAPI.Data
 {
     public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
     {

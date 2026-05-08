@@ -1,4 +1,4 @@
-﻿namespace LogosAPI.Interfaces
+﻿namespace WebAPI.Interfaces
 {
     public interface INotificationService
     {

@@ -1,11 +1,11 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using LogosAPI.Configuration;
-using LogosAPI.Data;
-using LogosAPI.Errors;
-using LogosAPI.Interfaces;
-using LogosAPI.Jobs;
-using LogosAPI.Services;
+using WebAPI.Configuration;
+using WebAPI.Data;
+using WebAPI.Errors;
+using WebAPI.Interfaces;
+using WebAPI.Jobs;
+using WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

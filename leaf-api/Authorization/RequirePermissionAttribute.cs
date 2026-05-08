@@ -1,8 +1,8 @@
-using LogosAPI.Errors;
+using WebAPI.Errors;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Management.Automation;
 
-namespace LogosAPI.Authorization
+namespace WebAPI.Authorization
 {
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]

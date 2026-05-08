@@ -1,13 +1,13 @@
-using LogosAPI.Authorization;
-using LogosAPI.Data;
-using LogosAPI.Dtos;
-using LogosAPI.Errors;
-using LogosAPI.Models;
+using WebAPI.Authorization;
+using WebAPI.Data;
+using WebAPI.Dtos;
+using WebAPI.Errors;
+using WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LogosAPI.Controllers;
+namespace WebAPI.Controllers;
 
 [Authorize]
 [Route("api/insurances")]

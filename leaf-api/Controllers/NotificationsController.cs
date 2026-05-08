@@ -1,11 +1,11 @@
-using LogosAPI.Authorization;
-using LogosAPI.Data;
+using WebAPI.Authorization;
+using WebAPI.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace LogosAPI.Controllers;
+namespace WebAPI.Controllers;
 
 [Authorize]
 [Route("api/providers/{providerSlug}/notifications")]
