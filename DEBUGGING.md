@@ -8,7 +8,7 @@
 
 1. **Start the Vite dev server** in a terminal:
    ```
-   cd logos-frontend
+   cd leaf-frontend
    npm run dev
    ```
    The server starts on `http://localhost:9000`.
@@ -17,11 +17,11 @@
 
    VS Code will launch a new Chrome window connected to the debugger.
 
-3. **Set breakpoints** — click the gutter next to any line in a `.tsx` or `.ts` file under `logos-frontend/src/`. The breakpoint will be hit when that code path runs in the browser.
+3. **Set breakpoints** — click the gutter next to any line in a `.tsx` or `.ts` file under `leaf-frontend/src/`. The breakpoint will be hit when that code path runs in the browser.
 
 ## How it works
 
-The configuration in [.vscode/launch.json](.vscode/launch.json) launches Chrome pointed at `http://localhost:9000` and maps the browser's source map paths (`/src/*`) back to the files on disk under `logos-frontend/src/`. Vite generates source maps automatically in development mode — no extra config is needed.
+The configuration in [.vscode/launch.json](.vscode/launch.json) launches Chrome pointed at `http://localhost:9000` and maps the browser's source map paths (`/src/*`) back to the files on disk under `leaf-frontend/src/`. Vite generates source maps automatically in development mode — no extra config is needed.
 
 ## Tips
 

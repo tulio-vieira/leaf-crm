@@ -6,9 +6,9 @@
       "request": "launch",
       "name": "Debug Frontend (Chrome)",
       "url": "http://localhost:9000",
-      "webRoot": "${workspaceFolder}/logos-frontend",
+      "webRoot": "${workspaceFolder}/leaf-frontend",
       "sourceMapPathOverrides": {
-        "/src/*": "${workspaceFolder}/logos-frontend/src/*"
+        "/src/*": "${workspaceFolder}/leaf-frontend/src/*"
       }
     }
   ]

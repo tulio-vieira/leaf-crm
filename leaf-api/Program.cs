@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 
-namespace LogosAPI
+namespace WebAPI
 {
     public class Program
     {
