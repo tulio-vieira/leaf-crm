@@ -9,6 +9,8 @@ namespace WebAPI.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
+        public DbSet<Board> Boards { get; set; }
+        public DbSet<Lead> Leads { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +25,15 @@ namespace WebAPI.Data
             modelBuilder.Entity<NotificationSubscription>()
                 .HasIndex(s => new { s.UserEmail })
                 .IsUnique(true);
+
+            modelBuilder.Entity<Board>()
+                .OwnsMany(b => b.Columns, builder => builder.ToJson());
+
+            modelBuilder.Entity<Lead>()
+                .HasOne(l => l.Board)
+                .WithMany(b => b.Leads)
+                .HasForeignKey(l => l.BoardId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
