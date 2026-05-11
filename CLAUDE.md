@@ -69,6 +69,57 @@ It is a generic, reusable component that accepts a declarative `filterItems` con
 Whenever we use frontend queries, we shoud use QueryFilters component. We should consider expanding QueryFilters if it doesn't suite our use cases.
 
 
+## Frontend Entity Management Pattern
+
+Every new manageable entity (e.g. Lead, Board, Customer) must follow this structure. The **Leads** implementation (`LeadScreen`, `LeadDetail`, `LeadForm`, `LeadList`, `LeadListItem`, `leadService.ts`) is the canonical reference.
+
+### 1. Domain type
+Add the entity interface to `src/models/Domain.ts`.
+
+### 2. Service file — `src/services/entityService.ts`
+Export typed async functions: `listEntities`, `getEntity`, `createEntity`, `updateEntity`, `deleteEntity`. All return `APIResponse<T>` (from `backendService.ts`). Catch errors and return `{ errMsg }`.
+
+### 3. Component files — `src/components/Entity/`
+
+**`EntityForm.tsx`**
+- Props: `entity?: Entity, onSuccess: () => void, onCancel: () => void`
+- Always rendered as an **open MUI Dialog** — the caller conditionally renders the component, not the modal.
+- Owns `PageState` for submission loading/error and any auxiliary fetches (e.g. dropdowns).
+- If `entity` prop is present → update mode; otherwise → create mode.
+
+**`EntityList.tsx`**
+- Props: `items: Entity[], hasNextPage: boolean, onChanged: () => void`
+- Dumb component: renders a MUI `Table` inside a `Paper`, maps items to `EntityListItem`, and renders `<PageSwitcher hasNextPage={hasNextPage} />` below.
+
+**`EntityListItem.tsx`**
+- Props: `entity: Entity, onChanged: () => void`
+- One `<TableRow>`. Owns its own delete state (`PageState` + `<ConfirmDialog>`) and edit state (`showEditForm` boolean + `<EntityForm>`). Calls `onChanged()` after a successful delete or update.
+
+### 4. Page files — `src/pages/`
+
+**`EntityScreen.tsx`**
+- State: `PageState<PagedResponse<Entity>>` for the list, `refreshKey: number`, `showCreateForm: boolean`, and any auxiliary state needed for filter dropdowns.
+- Effects: fetch entities on `[searchParams, refreshKey]` change (extract `page` and filter params from `searchParams`); fetch auxiliary data (e.g. dropdown sources) on mount.
+- Renders (top to bottom): page title + "Novo X" button → `<QueryFilters>` → loading/error/list.
+- Mutations increment `refreshKey` to trigger a re-fetch.
+
+**`EntityDetail.tsx`**
+- Fetches entity by `useParams` id; owns `PageState<Entity>`.
+- Shows all fields in a `Paper`. Top-right: Edit button (opens `EntityForm`) and Delete button (opens `ConfirmDialog`).
+- Successful delete navigates back to the list route.
+- Successful edit re-fetches the entity.
+
+### 5. Routing & navigation
+- Add `/entity` and `/entity/:id` as `<PrivateRoute>` entries in `src/App.tsx`.
+- Add a nav item to the `navItems` array in `src/components/Layout.tsx`.
+
+### 6. Key rules
+- Use `PageState<T>` (from `src/models/PageState.ts`) instead of separate `isLoading`/`errMsg`/`data` states.
+- All list screens must use `<QueryFilters>` for filters and `<PageSwitcher>` for pagination.
+- Use `<ConfirmDialog>` for all destructive actions.
+- All user-facing strings must be in **Brazilian Portuguese**.
+
+
 ## Authentication
 
 The app uses JWT authentication with an HttpOnly cookie for the access token.
