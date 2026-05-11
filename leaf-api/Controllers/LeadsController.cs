@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
         [RequirePermission("leads:read")]
         public async Task<Lead> GetLead(int id)
         {
-            return await context.Leads.FindAsync(id)
+            return await context.Leads.Include(l => l.Board).FirstOrDefaultAsync(l => l.Id == id)
                 ?? throw new NotFoundException("Lead não encontrado.");
         }
 

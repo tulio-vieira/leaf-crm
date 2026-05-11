@@ -1,3 +1,26 @@
+export interface Column {
+  name: string
+}
+
+export interface Board {
+  id: number
+  name: string
+  description?: string
+  columns: Column[]
+}
+
+export interface Lead {
+  id: number
+  name: string
+  description?: string
+  boardId: number
+  board?: Board
+  columnIdx: number
+  createdAt: string
+  modifiedAt: string
+  changedBy: string
+}
+
 export interface PagedResponse<T> {
   items: T[]
   page: number

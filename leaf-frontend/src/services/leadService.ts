@@ -1,0 +1,59 @@
+import type { Lead, PagedResponse } from '../models/Domain'
+import { backendAPI, type APIResponse } from './backendService'
+
+const PAGE_SIZE = parseInt(import.meta.env.VITE_PAGE_SIZE ?? '20')
+
+export interface LeadRequest {
+  name: string
+  description?: string
+  boardId: number
+  columnIdx: number
+}
+
+export async function listLeads(params: { page?: number; boardId?: number }): Promise<APIResponse<PagedResponse<Lead>>> {
+  try {
+    const { page = 1, boardId } = params
+    const query: Record<string, unknown> = { page, pageSize: PAGE_SIZE }
+    if (boardId !== undefined) query.boardId = boardId
+    const res = await backendAPI.get<PagedResponse<Lead>>('leads', query)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
+export async function getLead(id: number): Promise<APIResponse<Lead>> {
+  try {
+    const res = await backendAPI.get<Lead>(`leads/${id}`)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
+export async function createLead(data: LeadRequest): Promise<APIResponse<Lead>> {
+  try {
+    const res = await backendAPI.post<Lead>('leads', data)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
+export async function updateLead(id: number, data: LeadRequest): Promise<APIResponse<Lead>> {
+  try {
+    const res = await backendAPI.put<Lead>(`leads/${id}`, data)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
+export async function deleteLead(id: number): Promise<APIResponse<undefined>> {
+  try {
+    await backendAPI.delete(`leads/${id}`)
+    return {}
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}

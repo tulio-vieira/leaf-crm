@@ -15,8 +15,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import ContactPageIcon from '@mui/icons-material/ContactPage'
 import HomeIcon from '@mui/icons-material/Home'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import PolicyIcon from '@mui/icons-material/Policy'
-import { SearchOutlined } from '@mui/icons-material'
+import PeopleIcon from '@mui/icons-material/People'
 import { useAuth } from '../context/AuthContext'
 import LeafLogo from './LeafLogo'
 
@@ -34,11 +33,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Gestão de Clínicas', to: '/', icon: <HomeIcon /> },
-  { label: 'Pesquisa Global', to: '/list', icon: <SearchOutlined /> },
+  { label: 'Home', to: '/', icon: <HomeIcon /> },
+  { label: 'Leads', to: '/leads', icon: <PeopleIcon /> },
   { label: 'Contato', to: '/contact', icon: <ContactPageIcon /> },
   { label: 'Notificações', to: '/notifications', icon: <NotificationsIcon /> },
-  { label: 'Convênios', to: '/insurances', icon: <PolicyIcon /> },
   { label: 'Usuários e Cargos', to: '/admin', icon: <AdminPanelSettingsIcon />, authOnly: true },
 ]
 
@@ -129,8 +127,10 @@ export default function Layout({ children }: Props) {
                     slotProps={{
                       primary: {
                         variant: 'body2',
-                        fontWeight: selected ? 600 : 400,
-                        color: selected ? 'primary.light' : 'text.primary',
+                        sx: {
+                          fontWeight: selected ? 600 : 400,
+                          color: selected ? 'primary.light' : 'text.primary',
+                        },
                       },
                     }}
                   />

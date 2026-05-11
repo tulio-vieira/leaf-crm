@@ -1,5 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Dtos;
 using WebAPI.Errors;
 
@@ -18,6 +20,8 @@ namespace WebAPI.Models
 
         public required int BoardId { get; set; }
 
+        [ForeignKey(nameof(BoardId))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public Board? Board { get; set; }
 
         public required int ColumnIdx { get; set; }

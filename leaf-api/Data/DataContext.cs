@@ -16,24 +16,8 @@ namespace WebAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany()
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<NotificationSubscription>()
-                .HasIndex(s => new { s.UserEmail })
-                .IsUnique(true);
-
             modelBuilder.Entity<Board>()
                 .OwnsMany(b => b.Columns, builder => builder.ToJson());
-
-            modelBuilder.Entity<Lead>()
-                .HasOne(l => l.Board)
-                .WithMany(b => b.Leads)
-                .HasForeignKey(l => l.BoardId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

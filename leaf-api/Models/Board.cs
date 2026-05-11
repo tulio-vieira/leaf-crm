@@ -18,9 +18,6 @@ namespace WebAPI.Models
 
         public List<Column> Columns { get; set; } = [];
 
-        public List<Lead>? Leads { get; set; }
-
-
         public void Validate()
         {
             if (Columns.Count == 0) throw new ServiceException("Quadro deve conter ao menos uma coluna.");

@@ -13,6 +13,8 @@ import ProfilePage from './pages/Profile'
 import NotificationsScreen from './pages/NotificationsScreen'
 import AdminScreen from './pages/AdminScreen'
 import Contact from './pages/contact';
+import LeadScreen from './pages/LeadScreen'
+import LeadDetail from './pages/LeadDetail'
 
 function App() {
   return (
@@ -20,7 +22,6 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<PrivateRoute Component={Home}/>} />
-          {/* <Route path="/list/*" element={<PrivateRoute Component={GlobalQuery}/>} /> */}
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth/login" element={<LoginForm />} />
           <Route path="/auth/forgot-password" element={<ForgotPasswordForm />} />
@@ -30,6 +31,8 @@ function App() {
           <Route path="/user/profile" element={<PrivateRoute Component={ProfilePage} />} />
           <Route path="/notifications" element={<PrivateRoute Component={NotificationsScreen} />} />
           <Route path="/admin" element={<PrivateRoute Component={AdminScreen} />} />
+          <Route path="/leads" element={<PrivateRoute Component={LeadScreen} />} />
+          <Route path="/leads/:id" element={<PrivateRoute Component={LeadDetail} />} />
           <Route element={<NotFound />} />
         </Routes>
       </Layout>

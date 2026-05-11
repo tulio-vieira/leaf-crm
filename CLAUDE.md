@@ -22,6 +22,7 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 ## Backend Design:
 - MVC (Model View Controller)
 - TODO: talk about error handling here: we use exceptions, etc.
+- **Model configuration**: Prefer data annotations over Fluent API. Place `[ForeignKey]`, `[DeleteBehavior]`, and `[Index]` directly on model properties/classes (namespaces: `System.ComponentModel.DataAnnotations.Schema`, `Microsoft.EntityFrameworkCore`). Exception: `OwnsMany(...).ToJson()` for JSON-stored owned collections must remain in `OnModelCreating` — no data annotation equivalent exists.
 
 ## Backend Models:
 - User: represents a user that can login and use the platform.
@@ -57,6 +58,15 @@ The `WildcardMatcher` (`leaf-api/Authorization/WildcardMatcher.cs`) performs sim
 - We should attempt to keep our frontent react components simple and reusable. We should also aim to break down components between stateful ones and 'dumb' ones, if a component gets too large.
 - **Styling**: We are using MaterialUI as the frontend UI package. We should always aim to use MaterialUI components wherever possible.
 - The theme is on the darker side, but not too dark. The primary color is on the purple side and secondary should be on the cyan side. We are going for a modern look. Keep in mind this is a sales app.
+
+## Frontend Querying
+- Whenever querying for items, we should always keep use query params.
+- The frontend queries always result in updates to the query params that are passed to the backed. We use query filter component for this.
+
+
+## QueryFilters frontend component
+It is a generic, reusable component that accepts a declarative `filterItems` config and handles the add-filter flow, applied-filter state, chip display, and query-string construction — so future query views can delegate all of this to one place.
+Whenever we use frontend queries, we shoud use QueryFilters component. We should consider expanding QueryFilters if it doesn't suite our use cases.
 
 
 ## Authentication

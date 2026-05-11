@@ -1,6 +1,7 @@
 ﻿using WebAPI.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models
 {
@@ -34,6 +35,8 @@ namespace WebAPI.Models
 
         public int? RoleId { get; set; }
 
+        [ForeignKey(nameof(RoleId))]
+        [DeleteBehavior(DeleteBehavior.SetNull)]
         public Role? Role { get; set; }
 
 
