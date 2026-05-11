@@ -14,7 +14,7 @@ namespace WebAPI.Controllers;
 public class NotificationSubscriptionsController(DataContext context) : ControllerBase
 {
     [HttpPost]
-    [RequireProviderPermission(".notifications:read")]
+    [RequirePermission("notifications:read")]
     public async Task<IActionResult> Subscribe(string providerSlug)
     {
         var email = User.FindFirstValue(ClaimTypes.Email);
@@ -35,7 +35,7 @@ public class NotificationSubscriptionsController(DataContext context) : Controll
     }
 
     [HttpDelete]
-    [RequireProviderPermission(".notifications:read")]
+    [RequirePermission("notifications:read")]
     public async Task<IActionResult> Unsubscribe(string providerSlug)
     {
         var email = User.FindFirstValue(ClaimTypes.Email);

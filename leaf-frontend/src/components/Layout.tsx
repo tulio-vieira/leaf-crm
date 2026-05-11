@@ -1,29 +1,26 @@
-import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router'
-import AppBar from '@mui/material/AppBar'
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
-import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import ContactPageIcon from '@mui/icons-material/ContactPage'
 import HomeIcon from '@mui/icons-material/Home'
-import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import PolicyIcon from '@mui/icons-material/Policy'
+import { SearchOutlined } from '@mui/icons-material'
 import { useAuth } from '../context/AuthContext'
-import { SearchOutlined } from '@mui/icons-material';
+import LeafLogo from './LeafLogo'
+
+const DRAWER_WIDTH = 240
 
 interface Props {
   children: ReactNode
@@ -47,8 +44,8 @@ const navItems: NavItem[] = [
 
 export default function Layout({ children }: Props) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, isAuthenticated, logout } = useAuth()
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   function handleLogout(e: React.MouseEvent) {
     e.preventDefault()
@@ -59,80 +56,166 @@ export default function Layout({ children }: Props) {
   const visibleNavItems = navItems.filter(item => !item.authOnly || isAuthenticated)
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="sticky" elevation={2}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => setDrawerOpen(true)}
-            sx={{ mr: 1 }}
-            aria-label="Abrir menu"
-          >
-            <MenuIcon />
-          </IconButton>
-
-          <LocalHospitalIcon sx={{ mr: 1 }} />
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+          },
+        }}
+      >
+        {/* Logo */}
+        <Box
+          component={RouterLink}
+          to="/"
+          sx={{
+            px: 2.5,
+            py: 2.5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            textDecoration: 'none',
+            flexShrink: 0,
+          }}
+        >
+          <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center' }}>
+            <LeafLogo size={26} color="currentColor" />
+          </Box>
           <Typography
             variant="h6"
-            component={RouterLink}
-            to="/"
-            sx={{ flexGrow: 1, color: 'inherit', textDecoration: 'none', fontWeight: 700, letterSpacing: 0.5 }}
+            sx={{
+              fontWeight: 700,
+              letterSpacing: 0.3,
+              background: 'linear-gradient(135deg, #A78BFA 0%, #22D3EE 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
           >
             Leaf CRM
           </Typography>
+        </Box>
 
-          {isAuthenticated ? (
-            <>
-              <Button color="inherit" component={RouterLink} to="/user/profile">
-                {user?.username}
-              </Button>
-              <Button color="inherit" onClick={handleLogout}>Sair</Button>
-            </>
-          ) : (
-            <Button color="inherit" component={RouterLink} to="/auth/login">Login</Button>
-          )}
-        </Toolbar>
-      </AppBar>
+        <Divider />
 
-      <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
-          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <LocalHospitalIcon color="primary" />
-            <Typography variant="h6" sx={{fontWeight: 700}}>Leaf CRM</Typography>
-          </Box>
-          <Divider />
-          <List>
-            {visibleNavItems.map(item => (
-              <ListItem key={item.to} disablePadding>
-                <ListItemButton component={RouterLink} to={item.to}>
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.label} />
+        {/* Nav items */}
+        <List sx={{ flex: 1, overflowY: 'auto', px: 1, py: 1 }}>
+          {visibleNavItems.map(item => {
+            const selected = location.pathname === item.to
+            return (
+              <ListItem key={item.to} disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  component={RouterLink}
+                  to={item.to}
+                  selected={selected}
+                  sx={{ borderRadius: 1.5 }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 36,
+                      color: selected ? 'primary.light' : 'text.secondary',
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    slotProps={{
+                      primary: {
+                        variant: 'body2',
+                        fontWeight: selected ? 600 : 400,
+                        color: selected ? 'primary.light' : 'text.primary',
+                      },
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
-            ))}
-          </List>
+            )
+          })}
+        </List>
+
+        <Divider />
+
+        {/* User section */}
+        <Box sx={{ px: 2, py: 2, flexShrink: 0 }}>
+          {isAuthenticated ? (
+            <>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 500 }}>
+                {user?.username}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Button
+                  component={RouterLink}
+                  to="/user/profile"
+                  size="small"
+                  fullWidth
+                  variant="text"
+                  sx={{ justifyContent: 'flex-start', color: 'text.secondary', fontSize: '0.75rem' }}
+                >
+                  Meu Perfil
+                </Button>
+                <Button
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleLogout}
+                  sx={{ fontSize: '0.75rem' }}
+                >
+                  Sair
+                </Button>
+              </Box>
+            </>
+          ) : (
+            <Button
+              component={RouterLink}
+              to="/auth/login"
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="small"
+            >
+              Login
+            </Button>
+          )}
         </Box>
       </Drawer>
 
-      <Box component="main" sx={{ flex: 1, py: 4, backgroundColor: 'background.default' }}>
-        <Container maxWidth="lg">
-          {children}
-        </Container>
-      </Box>
-
+      {/* Main content */}
       <Box
-        component="footer"
         sx={{
-          py: 2,
-          backgroundColor: 'primary.dark',
-          color: 'white',
-          textAlign: 'center',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
         }}
       >
-        <Typography variant="body2">
-          © {new Date().getFullYear()} Leaf CRM. Todos os direitos reservados.
-        </Typography>
+        <Box component="main" sx={{ flex: 1, py: 4 }}>
+          <Container maxWidth="lg">
+            {children}
+          </Container>
+        </Box>
+
+        <Box
+          component="footer"
+          sx={{
+            py: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            © {new Date().getFullYear()} Leaf CRM. Todos os direitos reservados.
+          </Typography>
+        </Box>
       </Box>
     </Box>
   )

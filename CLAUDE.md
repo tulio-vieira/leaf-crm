@@ -21,6 +21,7 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 
 ## Backend Design:
 - MVC (Model View Controller)
+- TODO: talk about error handling here: we use exceptions, etc.
 
 ## Backend Models:
 - User: represents a user that can login and use the platform.
@@ -55,6 +56,8 @@ The `WildcardMatcher` (`leaf-api/Authorization/WildcardMatcher.cs`) performs sim
 - Please extend the patterns we are using. If you want to create a new one, ask for confirmation.
 - We should attempt to keep our frontent react components simple and reusable. We should also aim to break down components between stateful ones and 'dumb' ones, if a component gets too large.
 - **Styling**: We are using MaterialUI as the frontend UI package. We should always aim to use MaterialUI components wherever possible.
+- The theme is on the darker side, but not too dark. The primary color is on the purple side and secondary should be on the cyan side. We are going for a modern look. Keep in mind this is a sales app.
+
 
 ## Authentication
 

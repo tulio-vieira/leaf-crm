@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
 
 namespace WebAPI.Data;
@@ -8,6 +9,7 @@ public class DataSeeder(DataContext context)
 
     public async Task SeedAsync()
     {
+        if (await context.Users.AnyAsync()) return;
         await CreateUsers();
         await context.SaveChangesAsync();
     }

@@ -18,7 +18,7 @@ public class ListController(DataContext context, IOptions<PaginationOptions> pag
     private readonly PaginationOptions _pagination = paginationOptions.Value;
 
     [HttpGet("notifications")]
-    [RequireProviderPermission(".notifications:read")]
+    [RequirePermission("notifications:read")]
     public async Task<PagedResponse<Notification>> ListNotifications(
         [FromQuery] bool? acknowledged = null,
         [FromQuery] DateTime? createdat_gt = null,
