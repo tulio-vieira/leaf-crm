@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { useTheme } from '@mui/material/styles'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
 import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import Typography from '@mui/material/Typography'
@@ -41,6 +42,7 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
         parentId: 'root',
         children: colLeads.map(l => `lead-${l.id}`),
         totalChildrenCount: colLeads.length,
+        isDraggable: false
       },
     ]
   })
@@ -140,25 +142,26 @@ function BoardKanban({ board, leads, onRefresh }: Props) {
         onCardClick={handleCardClick}
         rootStyle={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}
         columnWrapperStyle={() => ({
-          background: theme.palette.background.paper,
-          borderRadius: 8,
           minWidth: 260,
           maxWidth: 300,
-          margin: '0 8px',
+          margin: '0 4px',
           flexShrink: 0,
         })}
-        columnHeaderStyle={() => ({
-          padding: '12px 16px',
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          fontWeight: 700,
-          fontSize: '0.875rem',
-          color: theme.palette.text.primary,
+        columnStyle={() => ({
+          background: theme.palette.background.paper,
+          borderRadius: '8px',
         })}
+        renderColumnHeader={(column) => (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              {column.title}
+            </Typography>
+            <Chip label={column.children.length} size="small" color="default" />
+          </Box>
+        )}
         columnListContentStyle={() => ({
           padding: '8px',
-          minHeight: 200,
-          display: 'flex',
-          flexDirection: 'column',
+          minHeight: '60vh',
           gap: 8,
         })}
       />
