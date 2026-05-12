@@ -4,7 +4,7 @@ namespace WebAPI.Dtos
 {
     public class BoardCreateRequest : BoardUpdateRequest
     {
-        public List<Column> Columns { get; private set; } = [];
+        public List<Column> Columns { get; set; } = [];
 
 
         public Board ToEntity()

@@ -16,6 +16,7 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'
 import HomeIcon from '@mui/icons-material/Home'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import PeopleIcon from '@mui/icons-material/People'
+import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { useAuth } from '../context/AuthContext'
 import LeafLogo from './LeafLogo'
 
@@ -35,6 +36,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Home', to: '/', icon: <HomeIcon /> },
   { label: 'Leads', to: '/leads', icon: <PeopleIcon /> },
+  { label: 'Quadros', to: '/boards', icon: <ViewKanbanIcon /> },
   { label: 'Contato', to: '/contact', icon: <ContactPageIcon /> },
   { label: 'Notificações', to: '/notifications', icon: <NotificationsIcon /> },
   { label: 'Usuários e Cargos', to: '/admin', icon: <AdminPanelSettingsIcon />, authOnly: true },

@@ -11,7 +11,11 @@
       "Bash(xargs grep -l \"UseAuthentication\\\\|IClaimsTransformation\")",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\vieir\\\\Documents\\\\learning\\\\leaf-project\\\\leaf-crm\\\\leaf-frontend\\\\src\" -Recurse -Directory)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\vieir\\\\Documents\\\\learning\\\\leaf-project\\\\leaf-crm\\\\leaf-frontend\\\\src\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(dotnet build *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\vieir\\\\Documents\\\\learning\\\\leaf-project\\\\leaf-crm\\\\leaf-api\" -Name)",
+      "Read(//c/Users/vieir/Documents/learning/leaf-project/leaf-frontend/src/models/**)",
+      "Read(//c/Users/vieir/Documents/learning/leaf-project/leaf-frontend/src/pages/**)"
     ]
   }
 }
