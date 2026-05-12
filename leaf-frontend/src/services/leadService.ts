@@ -49,6 +49,15 @@ export async function updateLead(id: number, data: LeadRequest): Promise<APIResp
   }
 }
 
+export async function listAllLeads(params: { boardId: number }): Promise<APIResponse<Lead[]>> {
+  try {
+    const res = await backendAPI.get<PagedResponse<Lead>>('leads', { page: 1, pageSize: 100, boardId: params.boardId })
+    return { data: res.data.items }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
 export async function deleteLead(id: number): Promise<APIResponse<undefined>> {
   try {
     await backendAPI.delete(`leads/${id}`)

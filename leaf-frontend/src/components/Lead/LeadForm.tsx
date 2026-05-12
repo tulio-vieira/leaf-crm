@@ -19,16 +19,17 @@ import { createLead, updateLead } from '../../services/leadService'
 
 interface Props {
   lead?: Lead
+  defaultBoardId?: number
   onSuccess: () => void
   onCancel: () => void
 }
 
-function LeadForm({ lead, onSuccess, onCancel }: Props) {
+function LeadForm({ lead, defaultBoardId, onSuccess, onCancel }: Props) {
   const isEdit = lead !== undefined
 
   const [name, setName] = useState(lead?.name ?? '')
   const [description, setDescription] = useState(lead?.description ?? '')
-  const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? '')
+  const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? defaultBoardId ?? '')
   const [columnIdx, setColumnIdx] = useState<number | ''>(lead?.columnIdx ?? '')
 
   const [formState, setFormState] = useState<PageState>({})
@@ -95,7 +96,7 @@ function LeadForm({ lead, onSuccess, onCancel }: Props) {
             disabled={formState.isLoading}
           />
 
-          <FormControl fullWidth required disabled={boardsState.isLoading || formState.isLoading}>
+          <FormControl fullWidth required disabled={boardsState.isLoading || formState.isLoading || (!isEdit && defaultBoardId !== undefined)}>
             <InputLabel>Funil</InputLabel>
             <Select
               value={boardId}

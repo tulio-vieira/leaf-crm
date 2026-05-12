@@ -9,8 +9,17 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 
 
 ## Core Features
-- The platform allows us to manage Leads. We can view leads in either a list or kanban board. TODO: add more documentation here.
+- The platform allows us to manage Leads. We can view leads in either a list (`/leads`) or kanban board (`/boards/:id`).
 - Granular permission-based authorization controls access to all API endpoints. Each user can have one Role that stores their permissions.
+
+### Boards and Leads — Kanban Model
+- A **Board** represents a sales funnel. It has a `name`, optional `description`, and a fixed ordered list of **columns** (stages), defined at creation time.
+- A **Lead** belongs to exactly one Board (`boardId`) and sits in one column (`columnIdx` — a zero-based index into `board.columns`).
+- Deleting a Board cascades and deletes all its Leads.
+- `BoardDetail` (`/boards/:id`) loads the board and all its leads in parallel, then renders `BoardKanban`.
+- `BoardKanban` uses `react-kanban-kit` to display leads grouped by column. Cards are draggable; dropping a card into a new column immediately calls `PUT /api/leads/{id}` to persist the new `columnIdx`. The update is applied optimistically to local state and reverted (via `onRefresh`) if the API call fails.
+- Lead cards are clickable and navigate to `/leads/:id`.
+- `listAllLeads({ boardId })` in `leadService.ts` fetches up to 100 leads for a given board without pagination — used for the kanban view. For paginated list views, use `listLeads(params)` instead.
 
 
 ### Technologies Used
@@ -27,7 +36,8 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 ## Backend Models:
 - User: represents a user that can login and use the platform.
 - Role: represents a set of permissions for a User. One Role per User (1:1). Fields: UserGuid (FK, PK), Permissions (semicolon-separated string), CreatedAt, ModifiedAt, ChangedBy (email of last editor).
-- Leads: (TODO: add description)
+- Board: a sales funnel with a name, optional description, and an ordered list of Column stages (stored as JSON via `OwnsMany(...).ToJson()`). Validation: at least 1 column, unique column names.
+- Lead: belongs to a Board (`BoardId` FK) and a column position (`ColumnIdx`, 0-based index into `Board.Columns`). Fields: Name, Description, BoardId, ColumnIdx, CreatedAt, ModifiedAt, ChangedBy. Cascade delete from Board.
 
 
 ### Wildcard Matching
