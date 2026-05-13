@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography'
 import { Kanban, dropHandler } from 'react-kanban-kit'
 import type { BoardData, BoardItem, BoardProps } from 'react-kanban-kit'
 import type { Board, Lead } from '../../models/Domain'
+import type { PageState } from '../../models/PageState'
 import { updateLead } from '../../services/leadService'
 
 type ConfigMap = BoardProps['configMap']
@@ -18,7 +19,6 @@ type DropCardParams = Parameters<Required<BoardProps>['onCardMove']>[0]
 interface Props {
   board: Board
   leads: Lead[]
-  onRefresh: () => void
 }
 
 function buildBoardData(board: Board, leads: Lead[]): BoardData {
@@ -32,8 +32,15 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
     totalChildrenCount: columnIds.length,
   }
 
+  const byCol = new Map<number, Lead[]>()
+  for (const lead of leads) {
+    const bucket = byCol.get(lead.columnIdx) ?? []
+    bucket.push(lead)
+    byCol.set(lead.columnIdx, bucket)
+  }
+
   const columnItems: [string, BoardItem][] = board.columns.map((col, i) => {
-    const colLeads = leads.filter(l => l.columnIdx === i)
+    const colLeads = byCol.get(i) ?? []
     return [
       `col-${i}`,
       {
@@ -42,7 +49,7 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
         parentId: 'root',
         children: colLeads.map(l => `lead-${l.id}`),
         totalChildrenCount: colLeads.length,
-        isDraggable: false
+        isDraggable: false,
       },
     ]
   })
@@ -63,11 +70,12 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
   return Object.fromEntries([['root', root], ...columnItems, ...cardItems]) as BoardData
 }
 
-function BoardKanban({ board, leads, onRefresh }: Props) {
+function BoardKanban({ board, leads }: Props) {
   const navigate = useNavigate()
   const theme = useTheme()
   const [boardData, setBoardData] = useState<BoardData>(() => buildBoardData(board, leads))
-  const [moveError, setMoveError] = useState<string | null>(null)
+  const [moveState, setMoveState] = useState<PageState>({})
+  const [moveSuccess, setMoveSuccess] = useState(false)
 
   useEffect(() => {
     setBoardData(buildBoardData(board, leads))
@@ -107,13 +115,12 @@ function BoardKanban({ board, leads, onRefresh }: Props) {
   }
 
   async function handleCardMove(cardMove: DropCardParams) {
-    const { position: _position, ...dropParams } = cardMove
-    setBoardData(prev => dropHandler(dropParams, prev))
-
+    const prevData = boardData  
     const leadId = parseInt(cardMove.cardId.replace('lead-', ''))
-    const newColumnIdx = parseInt(cardMove.toColumnId.replace('col-', ''))
-    const lead = leads.find(l => l.id === leadId)
+    const lead = prevData[`lead-${leadId}`]?.content as Lead | undefined
     if (!lead) return
+    setMoveState({ isLoading: true })
+    const newColumnIdx = parseInt(cardMove.toColumnId.replace('col-', ''))
 
     const res = await updateLead(leadId, {
       name: lead.name,
@@ -123,9 +130,20 @@ function BoardKanban({ board, leads, onRefresh }: Props) {
     })
 
     if (res.errMsg) {
-      setMoveError(res.errMsg)
-      onRefresh()
+      setMoveState({ errMsg: res.errMsg })
+      return
     }
+    setBoardData(prev =>
+      dropHandler(
+        cardMove,
+        prev,
+        undefined,
+        (col) => ({ ...col, totalChildrenCount: col.totalChildrenCount + 1 }),
+        (col) => ({ ...col, totalChildrenCount: col.totalChildrenCount - 1 }),
+      )
+    )
+    setMoveState({})
+    setMoveSuccess(true)
   }
 
   function handleCardClick(_e: React.MouseEvent<HTMLDivElement>, card: BoardItem) {
@@ -140,6 +158,7 @@ function BoardKanban({ board, leads, onRefresh }: Props) {
         configMap={configMap}
         onCardMove={handleCardMove}
         onCardClick={handleCardClick}
+        viewOnly={moveState.isLoading === true}
         rootStyle={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}
         columnWrapperStyle={() => ({
           minWidth: 260,
@@ -167,13 +186,24 @@ function BoardKanban({ board, leads, onRefresh }: Props) {
       />
 
       <Snackbar
-        open={moveError !== null}
+        open={!!moveState.errMsg}
         autoHideDuration={4000}
-        onClose={() => setMoveError(null)}
+        onClose={() => setMoveState({})}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="error" onClose={() => setMoveError(null)}>
-          {moveError}
+        <Alert severity="error" onClose={() => setMoveState({})}>
+          {moveState.errMsg}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={moveSuccess}
+        autoHideDuration={3000}
+        onClose={() => setMoveSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setMoveSuccess(false)}>
+          Lead movido com sucesso.
         </Alert>
       </Snackbar>
     </Box>

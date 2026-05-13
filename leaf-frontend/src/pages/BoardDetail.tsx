@@ -73,7 +73,6 @@ function BoardDetail() {
         <BoardKanban
           board={boardState.data}
           leads={leadsState.data}
-          onRefresh={handleRefresh}
         />
       )}
 
