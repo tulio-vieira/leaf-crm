@@ -95,7 +95,7 @@ function LeadDetail() {
               <Typography variant="body1">{lead.description || '—'}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">Funil</Typography>
+              <Typography variant="caption" color="text.secondary">Quadro</Typography>
               <Typography variant="body1">{lead.board?.name ?? lead.boardId}</Typography>
             </Box>
             <Box>

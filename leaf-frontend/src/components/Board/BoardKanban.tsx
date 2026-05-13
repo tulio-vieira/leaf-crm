@@ -91,6 +91,7 @@ function BoardKanban({ board, leads }: Props) {
             sx={{
               p: 1.5,
               cursor: 'pointer',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
               '&:hover': { bgcolor: 'action.hover' },
               borderRadius: 1,
             }}
@@ -167,8 +168,9 @@ function BoardKanban({ board, leads }: Props) {
           flexShrink: 0,
         })}
         columnStyle={() => ({
-          background: theme.palette.background.paper,
+          background: theme.palette.background.default,
           borderRadius: '8px',
+          border: `1px solid ${theme.palette.divider}`,
         })}
         renderColumnHeader={(column) => (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>

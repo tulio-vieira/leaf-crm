@@ -44,7 +44,7 @@ function LeadScreen() {
     {
       queryParam: 'boardId',
       inputType: 'dropdown',
-      displayName: 'Funil',
+      displayName: 'Quadro',
       availableOptions: (boardsState.data ?? []).map(b => ({ displayName: b.name, value: b.id })),
     },
   ]
