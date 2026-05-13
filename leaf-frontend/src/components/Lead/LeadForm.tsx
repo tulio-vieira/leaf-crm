@@ -19,23 +19,26 @@ import { createLead, updateLead } from '../../services/leadService'
 
 interface Props {
   lead?: Lead
-  defaultBoardId?: number
+  currBoard?: Board
   onSuccess: () => void
   onCancel: () => void
 }
 
-function LeadForm({ lead, defaultBoardId, onSuccess, onCancel }: Props) {
+function LeadForm({ lead, currBoard, onSuccess, onCancel }: Props) {
   const isEdit = lead !== undefined
 
   const [name, setName] = useState(lead?.name ?? '')
   const [description, setDescription] = useState(lead?.description ?? '')
-  const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? defaultBoardId ?? '')
+  const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? currBoard?.id ?? '')
   const [columnIdx, setColumnIdx] = useState<number | ''>(lead?.columnIdx ?? '')
 
   const [formState, setFormState] = useState<PageState>({})
   const [boardsState, setBoardsState] = useState<PageState<Board[]>>({ isLoading: true })
 
   useEffect(() => {
+    if (currBoard) {
+      return setBoardsState({data: [currBoard]})
+    }
     listAllBoards().then(res => {
       if (res.errMsg) {
         setBoardsState({ errMsg: res.errMsg })
@@ -46,14 +49,14 @@ function LeadForm({ lead, defaultBoardId, onSuccess, onCancel }: Props) {
   }, [])
 
   useEffect(() => {
+    if (!lead) return
     setName(lead?.name ?? '')
     setDescription(lead?.description ?? '')
     setBoardId(lead?.boardId ?? '')
     setColumnIdx(lead?.columnIdx ?? '')
   }, [lead])
 
-  const selectedBoard = boardsState.data?.find(b => b.id === boardId) ?? null
-  console.log("selectedBoard ", selectedBoard)
+  const selectedBoard = currBoard ? currBoard : boardsState.data?.find(b => b.id === boardId) ?? null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -96,11 +99,11 @@ function LeadForm({ lead, defaultBoardId, onSuccess, onCancel }: Props) {
             disabled={formState.isLoading}
           />
 
-          <FormControl fullWidth required disabled={boardsState.isLoading || formState.isLoading || (!isEdit && defaultBoardId !== undefined)}>
-            <InputLabel>Funil</InputLabel>
+          <FormControl fullWidth required disabled={boardsState.isLoading || formState.isLoading || (!isEdit && currBoard !== undefined)}>
+            <InputLabel>Quadro</InputLabel>
             <Select
               value={boardId}
-              label="Funil"
+              label="Quadro"
               onChange={e => {
                 setBoardId(e.target.value as number)
                 setColumnIdx('')
@@ -131,7 +134,7 @@ function LeadForm({ lead, defaultBoardId, onSuccess, onCancel }: Props) {
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={formState.isLoading || boardsState.isLoading || !name || boardId === '' || columnIdx === ''}
+          disabled={formState.isLoading || boardsState.isLoading || !name || boardId === undefined || columnIdx === undefined}
         >
           {formState.isLoading ? <CircularProgress size={20} color="inherit" /> : isEdit ? 'Salvar' : 'Criar'}
         </Button>

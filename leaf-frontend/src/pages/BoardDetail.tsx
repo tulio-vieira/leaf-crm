@@ -76,9 +76,9 @@ function BoardDetail() {
         />
       )}
 
-      {showCreateForm && boardId && (
+      {showCreateForm && boardId && boardState.data && (
         <LeadForm
-          defaultBoardId={boardId}
+          currBoard={boardState.data}
           onSuccess={() => { setShowCreateForm(false); handleRefresh() }}
           onCancel={() => setShowCreateForm(false)}
         />
