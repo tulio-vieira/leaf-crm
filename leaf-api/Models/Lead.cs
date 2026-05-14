@@ -7,6 +7,7 @@ using WebAPI.Errors;
 
 namespace WebAPI.Models
 {
+    [Index(nameof(BoardId), nameof(ColumnIdx), nameof(Position))]
     public class Lead
     {
         [Key]
@@ -25,6 +26,8 @@ namespace WebAPI.Models
         public Board? Board { get; set; }
 
         public required int ColumnIdx { get; set; }
+
+        public string? Position { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -45,6 +48,7 @@ namespace WebAPI.Models
             Description = r.Description;
             BoardId = r.BoardId;
             ColumnIdx = r.ColumnIdx;
+            Position = r.Position;
             ModifiedAt = DateTime.UtcNow;
             ChangedBy = changedBy;
         }

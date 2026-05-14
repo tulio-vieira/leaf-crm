@@ -45,10 +45,23 @@ namespace WebAPI.Controllers
 
         [HttpGet("{id}")]
         [RequirePermission("boards:read")]
-        public async Task<Board> GetBoard(int id)
+        public async Task<BoardDetailResponse> GetBoard(int id)
         {
-            return await context.Boards.FindAsync(id)
+            var board = await context.Boards.FindAsync(id)
                 ?? throw new NotFoundException("Quadro não encontrado.");
+
+            var grouped = await context.Leads
+                .Where(l => l.BoardId == id)
+                .GroupBy(l => l.ColumnIdx)
+                .Select(g => new { ColumnIdx = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var counts = new int[board.Columns.Count];
+            foreach (var g in grouped)
+                if (g.ColumnIdx >= 0 && g.ColumnIdx < counts.Length)
+                    counts[g.ColumnIdx] = g.Count;
+
+            return new BoardDetailResponse { Board = board, ColumnCounts = counts.ToList() };
         }
 
         [HttpPost]

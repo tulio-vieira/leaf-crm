@@ -9,6 +9,11 @@ export interface Board {
   columns: Column[]
 }
 
+export interface BoardDetailResponse {
+  board: Board
+  columnCounts: number[]
+}
+
 export interface Lead {
   id: number
   name: string
@@ -16,6 +21,7 @@ export interface Lead {
   boardId: number
   board?: Board
   columnIdx: number
+  position?: string
   createdAt: string
   modifiedAt: string
   changedBy: string

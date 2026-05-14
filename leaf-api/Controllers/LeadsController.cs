@@ -24,17 +24,42 @@ namespace WebAPI.Controllers
         public async Task<PagedResponse<Lead>> ListLeads(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 0,
-            [FromQuery] int? boardId = null)
+            [FromQuery] int? boardId = null,
+            [FromQuery] int? columnIdx = null,
+            [FromQuery] string? afterPosition = null)
         {
             if (pageSize <= 0) pageSize = _pagination.DefaultPageSize;
             if (pageSize > _pagination.MaxPageSize) pageSize = _pagination.MaxPageSize;
             if (page < 1) page = 1;
 
             var query = context.Leads.AsQueryable();
+
             if (boardId.HasValue)
                 query = query.Where(l => l.BoardId == boardId.Value);
 
-            query = query.OrderBy(l => l.Name);
+            if (columnIdx.HasValue)
+                query = query.Where(l => l.ColumnIdx == columnIdx.Value);
+
+            // Position DESC, NULLs last, then Id DESC as tiebreaker
+            query = query
+                .OrderBy(l => l.Position == null ? 1 : 0)
+                .ThenByDescending(l => l.Position)
+                .ThenByDescending(l => l.Id);
+
+            if (afterPosition != null)
+            {
+                var cursor = afterPosition;
+                query = query.Where(l => l.Position == null || string.Compare(l.Position, cursor) < 0);
+
+                var cursorItems = await query.Take(pageSize + 1).ToListAsync();
+                return new PagedResponse<Lead>
+                {
+                    Items = cursorItems.Take(pageSize).ToList(),
+                    Page = 1,
+                    PageSize = pageSize,
+                    HasNextPage = cursorItems.Count > pageSize
+                };
+            }
 
             var items = await query
                 .Skip((page - 1) * pageSize)

@@ -1,4 +1,4 @@
-import type { Board, PagedResponse } from '../models/Domain'
+import type { Board, BoardDetailResponse, PagedResponse } from '../models/Domain'
 import { backendAPI, type APIResponse } from './backendService'
 
 const PAGE_SIZE = parseInt(import.meta.env.VITE_PAGE_SIZE ?? '20')
@@ -33,9 +33,9 @@ export async function listBoards(params: { page?: number }): Promise<APIResponse
   }
 }
 
-export async function getBoard(id: number): Promise<APIResponse<Board>> {
+export async function getBoard(id: number): Promise<APIResponse<BoardDetailResponse>> {
   try {
-    const res = await backendAPI.get<Board>(`boards/${id}`)
+    const res = await backendAPI.get<BoardDetailResponse>(`boards/${id}`)
     return { data: res.data }
   } catch (err: any) {
     return { errMsg: err?.response?.data?.title ?? 'Request failed' }

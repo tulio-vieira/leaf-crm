@@ -1,27 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useTheme } from '@mui/material/styles'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Paper from '@mui/material/Paper'
+import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
 import Typography from '@mui/material/Typography'
+import { generateKeyBetween } from 'fractional-indexing'
 import { Kanban, dropHandler } from 'react-kanban-kit'
 import type { BoardData, BoardItem, BoardProps } from 'react-kanban-kit'
 import type { Board, Lead } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
-import { updateLead } from '../../services/leadService'
+import { listColumnLeads, updateLead } from '../../services/leadService'
 
 type ConfigMap = BoardProps['configMap']
 type DropCardParams = Parameters<Required<BoardProps>['onCardMove']>[0]
 
 interface Props {
   board: Board
-  leads: Lead[]
+  columnCounts: number[]
 }
 
-function buildBoardData(board: Board, leads: Lead[]): BoardData {
+function buildInitialBoardData(board: Board, columnCounts: number[]): BoardData {
   const columnIds = board.columns.map((_, i) => `col-${i}`)
 
   const root: BoardItem = {
@@ -32,54 +34,29 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
     totalChildrenCount: columnIds.length,
   }
 
-  const byCol = new Map<number, Lead[]>()
-  for (const lead of leads) {
-    const bucket = byCol.get(lead.columnIdx) ?? []
-    bucket.push(lead)
-    byCol.set(lead.columnIdx, bucket)
-  }
-
-  const columnItems: [string, BoardItem][] = board.columns.map((col, i) => {
-    const colLeads = byCol.get(i) ?? []
-    return [
-      `col-${i}`,
-      {
-        id: `col-${i}`,
-        title: col.name,
-        parentId: 'root',
-        children: colLeads.map(l => `lead-${l.id}`),
-        totalChildrenCount: colLeads.length,
-        isDraggable: false,
-      },
-    ]
-  })
-
-  const cardItems: [string, BoardItem][] = leads.map(lead => [
-    `lead-${lead.id}`,
+  const columnItems: [string, BoardItem][] = board.columns.map((col, i) => [
+    `col-${i}`,
     {
-      id: `lead-${lead.id}`,
-      title: lead.name,
-      parentId: `col-${lead.columnIdx}`,
+      id: `col-${i}`,
+      title: col.name,
+      parentId: 'root',
       children: [],
-      totalChildrenCount: 0,
-      content: lead,
-      type: 'lead',
+      totalChildrenCount: columnCounts[i] ?? 0,
+      isDraggable: false,
     },
   ])
 
-  return Object.fromEntries([['root', root], ...columnItems, ...cardItems]) as BoardData
+  return Object.fromEntries([['root', root], ...columnItems]) as BoardData
 }
 
-function BoardKanban({ board, leads }: Props) {
+function BoardKanban({ board, columnCounts }: Props) {
   const navigate = useNavigate()
   const theme = useTheme()
-  const [boardData, setBoardData] = useState<BoardData>(() => buildBoardData(board, leads))
-  const [moveState, setMoveState] = useState<PageState>({})
-  const [moveSuccess, setMoveSuccess] = useState(false)
 
-  useEffect(() => {
-    setBoardData(buildBoardData(board, leads))
-  }, [board, leads])
+  const [boardData, setBoardData] = useState<BoardData>(() => buildInitialBoardData(board, columnCounts))
+  const [columnCursors, setColumnCursors] = useState<Record<string, string | undefined>>({})
+  const loadingColumnsRef = useRef<Set<string>>(new Set())
+  const [moveState, setMoveState] = useState<PageState>({})
 
   const configMap: ConfigMap = {
     lead: {
@@ -91,13 +68,16 @@ function BoardKanban({ board, leads }: Props) {
             sx={{
               p: 1.5,
               cursor: 'pointer',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
+              border: `1px solid ${theme.palette.divider}`,
               '&:hover': { bgcolor: 'action.hover' },
               borderRadius: 1,
             }}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
               {lead.name}
+            </Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
+              Position: {lead.position}
             </Typography>
             {lead.description && (
               <Typography
@@ -115,41 +95,112 @@ function BoardKanban({ board, leads }: Props) {
     },
   }
 
+  async function handleLoadMore(columnId: string) {
+    if (loadingColumnsRef.current.has(columnId)) return
+
+    const col = boardData[columnId]
+    if (!col || col.children.length >= col.totalChildrenCount) return
+
+    loadingColumnsRef.current.add(columnId)
+
+    const colIdx = parseInt(columnId.replace('col-', ''))
+    const afterPosition = columnCursors[columnId]
+
+    const res = await listColumnLeads({ boardId: board.id, columnIdx: colIdx, afterPosition })
+    loadingColumnsRef.current.delete(columnId)
+
+    if (res.errMsg || !res.data || res.data.items.length === 0) return
+
+    const newLeads = res.data.items
+    const last = newLeads[newLeads.length - 1]
+    if (last.position != null) {
+      setColumnCursors(prev => ({ ...prev, [columnId]: last.position! }))
+    }
+
+    const newCardEntries: [string, BoardItem][] = newLeads.map(lead => [
+      `${lead.id}`,
+      {
+        id: `${lead.id}`,
+        title: lead.name,
+        parentId: columnId,
+        children: [],
+        totalChildrenCount: 0,
+        content: lead,
+        type: 'lead',
+      },
+    ])
+
+    setBoardData(prev => {
+      const c = prev[columnId]
+      if (!c) return prev
+      return {
+        ...prev,
+        ...Object.fromEntries(newCardEntries),
+        [columnId]: { ...c, children: [...c.children, ...newLeads.map(l => `${l.id}`)] },
+      }
+    })
+  }
+
+  useEffect(() => {
+    board.columns.forEach((_, i) => {
+      if ((columnCounts[i] ?? 0) > 0) {
+        handleLoadMore(`col-${i}`)
+      }
+    })
+  }, [])
+
   async function handleCardMove(cardMove: DropCardParams) {
-    const prevData = boardData  
-    const leadId = parseInt(cardMove.cardId.replace('lead-', ''))
-    const lead = prevData[`lead-${leadId}`]?.content as Lead | undefined
-    if (!lead) return
-    setMoveState({ isLoading: true })
+    const prevData = boardData
+    setBoardData(prev => dropHandler(
+      cardMove,
+      prev,
+      undefined,
+      (col) => ({ ...col, totalChildrenCount: col.totalChildrenCount + 1 }),
+      (col) => ({ ...col, totalChildrenCount: Math.max(0, col.totalChildrenCount - 1) }),
+    ))
+    const leadId = parseInt(cardMove.cardId)
     const newColumnIdx = parseInt(cardMove.toColumnId.replace('col-', ''))
+    const lead = boardData[`${leadId}`]?.content as Lead | undefined
+    if (!lead) return
+
+    setMoveState({ isLoading: true })
+
+    // Leads are displayed descending (highest position = top of column).
+    // taskAbove is visually higher → fractionally higher value.
+    // taskBelow is visually lower  → fractionally lower value.
+    // generateKeyBetween expects (lower, upper), so arguments are swapped.
+    const abovePos = cardMove.taskAbove
+      ? ((boardData[cardMove.taskAbove]?.content as Lead | undefined)?.position ?? null)
+      : null
+    const belowPos = cardMove.taskBelow
+      ? ((boardData[cardMove.taskBelow]?.content as Lead | undefined)?.position ?? null)
+      : null
+
+    let newPosition: string | null = null
+    try {
+      newPosition = generateKeyBetween(belowPos, abovePos)
+    } catch {
+      newPosition = null
+    }
 
     const res = await updateLead(leadId, {
       name: lead.name,
       description: lead.description,
       boardId: lead.boardId,
       columnIdx: newColumnIdx,
+      position: newPosition ?? undefined,
     })
 
     if (res.errMsg) {
+      setBoardData(prevData)
       setMoveState({ errMsg: res.errMsg })
-      return
+    } else {
+      setMoveState({})
     }
-    setBoardData(prev =>
-      dropHandler(
-        cardMove,
-        prev,
-        undefined,
-        (col) => ({ ...col, totalChildrenCount: col.totalChildrenCount + 1 }),
-        (col) => ({ ...col, totalChildrenCount: col.totalChildrenCount - 1 }),
-      )
-    )
-    setMoveState({})
-    setMoveSuccess(true)
   }
 
   function handleCardClick(_e: React.MouseEvent<HTMLDivElement>, card: BoardItem) {
-    const leadId = card.id.replace('lead-', '')
-    navigate(`/leads/${leadId}`)
+    navigate(`/leads/${card.id}`)
   }
 
   return (
@@ -159,7 +210,13 @@ function BoardKanban({ board, leads }: Props) {
         configMap={configMap}
         onCardMove={handleCardMove}
         onCardClick={handleCardClick}
-        viewOnly={moveState.isLoading === true}
+        loadMore={handleLoadMore}
+        renderSkeletonCard={() => (
+          <Paper elevation={2} sx={{ p: 1.5, borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+            <Skeleton variant="text" width="60%" />
+            <Skeleton variant="text" width="80%" />
+          </Paper>
+        )}
         rootStyle={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}
         columnWrapperStyle={() => ({
           minWidth: 260,
@@ -177,7 +234,7 @@ function BoardKanban({ board, leads }: Props) {
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {column.title}
             </Typography>
-            <Chip label={column.children.length} size="small" color="default" />
+            <Chip label={column.totalChildrenCount} size="small" color="default" />
           </Box>
         )}
         columnListContentStyle={() => ({
@@ -197,8 +254,7 @@ function BoardKanban({ board, leads }: Props) {
           {moveState.errMsg}
         </Alert>
       </Snackbar>
-
-      <Snackbar
+      {/* <Snackbar
         open={moveSuccess}
         autoHideDuration={3000}
         onClose={() => setMoveSuccess(false)}
@@ -207,7 +263,7 @@ function BoardKanban({ board, leads }: Props) {
         <Alert severity="success" onClose={() => setMoveSuccess(false)}>
           Lead movido com sucesso.
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   )
 }

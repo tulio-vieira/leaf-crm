@@ -2,6 +2,12 @@ using WebAPI.Models;
 
 namespace WebAPI.Dtos
 {
+    public class BoardDetailResponse
+    {
+        public required Board Board { get; set; }
+        public required List<int> ColumnCounts { get; set; }
+    }
+
     public class BoardCreateRequest : BoardUpdateRequest
     {
         public List<Column> Columns { get; set; } = [];
