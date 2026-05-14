@@ -76,9 +76,8 @@ function BoardKanban({ board, leads }: Props) {
   const navigate = useNavigate()
   const theme = useTheme()
   const [boardData, setBoardData] = useState<BoardData>(() => buildBoardData(board, leads))
-  const [moveState, setMoveState] = useState<PageState>({})
+  const [reqState, setReqState] = useState<PageState<string>>({})
 
-  // TODO: usememo here?
   const configMap: ConfigMap = {
     lead: {
       render: ({ data }: { data: BoardItem }) => {
@@ -90,16 +89,19 @@ function BoardKanban({ board, leads }: Props) {
   }
 
   async function handleLoadMore(column: BoardItem) {
+    if (reqState.isLoading) return
     const colIdx = parseInt(column.id.replace('col-', ''))
 
     const afterPosition = column.children.length ? boardData[column.children[column.children.length - 1]].content.position : null
+
+    setReqState({ isLoading: true })
     const res = await listColumnLeads({ boardId: board.id, columnIdx: colIdx, afterPosition })
 
-    // TODO: display error message from here. Also get hasmore from response
-    if (res.errMsg || !res.data) return
     if (res.errMsg) {
-      // ...
+      setReqState({ errMsg: res.errMsg })
+      return
     }
+    if (!res.data) return
 
     const newLeads = res.data.items
 
@@ -126,16 +128,18 @@ function BoardKanban({ board, leads }: Props) {
         [column.id]: { ...c, totalChildrenCount: newCount, children: newChildren },
       }
     })
+    setReqState({})
   }
 
   async function handleCardMove(cardMove: DropCardParams) {
+    if (reqState.isLoading) return
     const prevData = boardData
     const leadId = parseInt(cardMove.cardId)
     const newColumnIdx = parseInt(cardMove.toColumnId.replace('col-', ''))
     const lead = boardData[`${leadId}`]?.content as Lead | undefined
     if (!lead) return
 
-    setMoveState({ isLoading: true })
+    setReqState({ isLoading: true })
 
     // Leads are displayed descending (highest position = top of column).
     // taskAbove is visually higher → fractionally higher value.
@@ -148,15 +152,13 @@ function BoardKanban({ board, leads }: Props) {
       ? ((boardData[cardMove.taskBelow]?.content as Lead | undefined)?.position ?? null)
       : null
 
-    let newPosition: string | null = null
+    let newPosition = "a0"
     try {
       newPosition = generateKeyBetween(belowPos, abovePos)
-    } catch {
-      newPosition = null
-    }
+    } catch {}
 
-    // TODO: fix empty string here
-    const newLead = {...lead, columnIdx: newColumnIdx, position: newPosition || ""}
+    const newLead = {...lead, columnIdx: newColumnIdx, position: newPosition }
+
     setBoardData(prev => {
       prev[`${leadId}`].content = newLead
       return dropHandler(
@@ -172,9 +174,9 @@ function BoardKanban({ board, leads }: Props) {
 
     if (res.errMsg) {
       setBoardData(prevData)
-      setMoveState({ errMsg: res.errMsg })
+      setReqState({ errMsg: res.errMsg })
     } else {
-      setMoveState({})
+      setReqState({ data: "Lead movido com sucesso."})
     }
   }
 
@@ -217,25 +219,25 @@ function BoardKanban({ board, leads }: Props) {
       />
 
       <Snackbar
-        open={!!moveState.errMsg}
+        open={reqState.errMsg !== undefined}
         autoHideDuration={4000}
-        onClose={() => setMoveState({})}
+        onClose={() => setReqState({})}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="error" onClose={() => setMoveState({})}>
-          {moveState.errMsg}
+        <Alert severity="error" onClose={() => setReqState({})}>
+          {reqState.errMsg}
         </Alert>
       </Snackbar>
-      {/* <Snackbar
-        open={moveSuccess}
+      <Snackbar
+        open={reqState.data !== undefined}
         autoHideDuration={3000}
-        onClose={() => setMoveSuccess(false)}
+        onClose={() => setReqState({})}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" onClose={() => setMoveSuccess(false)}>
+        <Alert severity="success" onClose={() => setReqState({})}>
           Lead movido com sucesso.
         </Alert>
-      </Snackbar> */}
+      </Snackbar>
     </Box>
   )
 }

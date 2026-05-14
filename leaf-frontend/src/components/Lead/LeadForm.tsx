@@ -16,16 +16,17 @@ import type { Board, Lead } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { generateKeyBetween } from 'fractional-indexing'
 import { listAllBoards } from '../../services/boardService'
-import { createLead, listColumnLeads, updateLead } from '../../services/leadService'
+import { createLead, updateLead } from '../../services/leadService'
 
 interface Props {
   lead?: Lead
   currBoard?: Board
+  columnCursors: Record<number, string | undefined>
   onSuccess: () => void
   onCancel: () => void
 }
 
-function LeadForm({ lead, currBoard, onSuccess, onCancel }: Props) {
+function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props) {
   const isEdit = lead !== undefined
 
   const [name, setName] = useState(lead?.name ?? '')
@@ -59,16 +60,14 @@ function LeadForm({ lead, currBoard, onSuccess, onCancel }: Props) {
 
   const selectedBoard = currBoard ? currBoard : boardsState.data?.find(b => b.id === boardId) ?? null
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     if (boardId === '' || columnIdx === '') return
     setFormState({ isLoading: true })
 
     let position: string | undefined = lead?.position
     if (!isEdit) {
-      // TODO: do something to avoid making a request here.
-      const topRes = await listColumnLeads({ boardId: boardId as number, columnIdx: columnIdx as number, pageSize: 1 })
-      const highestPos = topRes.data?.items[0]?.position ?? null
+      const highestPos = columnCursors[columnIdx]
       position = generateKeyBetween(highestPos, null)
     }
 

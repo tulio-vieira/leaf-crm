@@ -14,9 +14,25 @@ import type { PageState } from '../models/PageState'
 import { getBoard } from '../services/boardService'
 import { listAllLeads } from '../services/leadService'
 
+
+interface BoardDetail {
+  board: Board
+  columnCursors: Record<number, string>
+}
+
+function calculateColumnCursors(leads?: Lead[]) {
+  const columnCursors: Record<number, string> = {}
+  if (!leads) return columnCursors
+  for (let l of leads) {
+    if (!columnCursors[l.columnIdx]) columnCursors[l.columnIdx] = l.position
+  }
+  return columnCursors
+}
+
+
 function BoardDetail() {
   const { id } = useParams()
-  const [boardState, setBoardState] = useState<PageState<Board>>({ isLoading: true })
+  const [boardState, setBoardState] = useState<PageState<BoardDetail>>({ isLoading: true })
   const [leadsState, setLeadsState] = useState<PageState<Lead[]>>({ isLoading: true })
   const [refreshKey, setRefreshKey] = useState(0)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -32,7 +48,13 @@ function BoardDetail() {
       listAllLeads({ boardId }),
     ]).then(([boardRes, leadsRes]) => {
       if (boardRes.errMsg) setBoardState({ errMsg: boardRes.errMsg })
-      else setBoardState({ data: boardRes.data })
+      else {
+        if (!boardRes.data) return
+        setBoardState({ data: {
+          board: boardRes.data,
+          columnCursors: calculateColumnCursors(leadsRes.data)
+        }})
+      }
       if (leadsRes.errMsg) setLeadsState({ errMsg: leadsRes.errMsg })
       else setLeadsState({ data: leadsRes.data })
     })
@@ -49,7 +71,7 @@ function BoardDetail() {
     <Box>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
-          {boardState.data?.name ?? 'Quadro'}
+          {boardState.data?.board.name ?? 'Quadro'}
         </Typography>
         {boardState.data && (
           <Button
@@ -71,14 +93,15 @@ function BoardDetail() {
 
       {boardState.data && leadsState.data && (
         <BoardKanban
-          board={boardState.data}
+          board={boardState.data.board}
           leads={leadsState.data}
         />
       )}
 
-      {showCreateForm && boardId && boardState.data && (
+      {showCreateForm && boardId && boardState.data?.board && (
         <LeadForm
-          currBoard={boardState.data}
+          currBoard={boardState.data.board}
+          columnCursors={boardState.data.columnCursors}
           onSuccess={() => { setShowCreateForm(false); handleRefresh() }}
           onCancel={() => setShowCreateForm(false)}
         />
