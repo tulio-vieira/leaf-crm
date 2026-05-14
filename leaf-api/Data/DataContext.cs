@@ -18,6 +18,10 @@ namespace WebAPI.Data
 
             modelBuilder.Entity<Board>()
                 .OwnsMany(b => b.Columns, builder => builder.ToJson());
+
+            modelBuilder.Entity<Lead>()
+                .Property(l => l.Position)
+                .UseCollation("C");
         }
     }
 }

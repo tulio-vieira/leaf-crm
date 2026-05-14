@@ -14,8 +14,9 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import type { Board, Lead } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
+import { generateKeyBetween } from 'fractional-indexing'
 import { listAllBoards } from '../../services/boardService'
-import { createLead, updateLead } from '../../services/leadService'
+import { createLead, listColumnLeads, updateLead } from '../../services/leadService'
 
 interface Props {
   lead?: Lead
@@ -62,7 +63,16 @@ function LeadForm({ lead, currBoard, onSuccess, onCancel }: Props) {
     e.preventDefault()
     if (boardId === '' || columnIdx === '') return
     setFormState({ isLoading: true })
-    const data = { name, description, boardId, columnIdx }
+
+    let position: string | undefined = lead?.position
+    if (!isEdit) {
+      // TODO: do something to avoid making a request here.
+      const topRes = await listColumnLeads({ boardId: boardId as number, columnIdx: columnIdx as number, pageSize: 1 })
+      const highestPos = topRes.data?.items[0]?.position ?? null
+      position = generateKeyBetween(highestPos, null)
+    }
+
+    const data = { name, description, boardId: boardId as number, columnIdx: columnIdx as number, position }
     const res = isEdit ? await updateLead(lead!.id, data) : await createLead(data)
     if (res.errMsg) {
       setFormState({ errMsg: res.errMsg })

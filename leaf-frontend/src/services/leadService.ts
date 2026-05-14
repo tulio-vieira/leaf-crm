@@ -8,6 +8,7 @@ export interface LeadRequest {
   description?: string
   boardId: number
   columnIdx: number
+  position?: string
 }
 
 export async function listLeads(params: { page?: number; boardId?: number }): Promise<APIResponse<PagedResponse<Lead>>> {
@@ -53,6 +54,23 @@ export async function listAllLeads(params: { boardId: number }): Promise<APIResp
   try {
     const res = await backendAPI.get<PagedResponse<Lead>>('leads', { page: 1, pageSize: 100, boardId: params.boardId })
     return { data: res.data.items }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
+export async function listColumnLeads(params: {
+  boardId: number
+  columnIdx: number
+  afterPosition?: string
+  pageSize?: number
+}): Promise<APIResponse<PagedResponse<Lead>>> {
+  try {
+    const { boardId, columnIdx, afterPosition, pageSize = PAGE_SIZE } = params
+    const query: Record<string, unknown> = { boardId, columnIdx, pageSize }
+    if (afterPosition !== undefined) query.afterPosition = afterPosition
+    const res = await backendAPI.get<PagedResponse<Lead>>('leads', query)
+    return { data: res.data }
   } catch (err: any) {
     return { errMsg: err?.response?.data?.title ?? 'Request failed' }
   }

@@ -12,6 +12,7 @@ namespace WebAPI.Dtos
 
         public required int ColumnIdx { get; set; }
 
+        public required string Position { get; set; }
 
         public Lead ToEntity(string changedBy)
         {
@@ -21,6 +22,7 @@ namespace WebAPI.Dtos
                 Description = Description,
                 BoardId = BoardId,
                 ColumnIdx = ColumnIdx,
+                Position = Position,
                 ChangedBy = changedBy
             };
         }

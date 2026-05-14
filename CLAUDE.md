@@ -21,6 +21,15 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 - Lead cards are clickable and navigate to `/leads/:id`.
 - `listAllLeads({ boardId })` in `leadService.ts` fetches up to 100 leads for a given board without pagination — used for the kanban view. For paginated list views, use `listLeads(params)` instead.
 
+### Fractional Indexing for Lead Order
+- Each Lead has a `Position` string column that stores a fractional index key (e.g. `a0`, `b5`, `Zz`). This determines display order within a column without requiring sequential integers.
+- The frontend uses the `fractional-indexing` npm package (`generateKeyBetween`). The key space is ordered so that uppercase letters sort *before* lowercase — `Zz < a0` — following ASCII/byte order.
+- **Critical**: the `Position` column must use `COLLATE "C"` (byte/ASCII order) in PostgreSQL. Default locale-aware collations (e.g. `en_US.UTF-8`) sort uppercase *after* lowercase, inverting the order and causing wrong card ordering. This collation is set via Fluent API in `DataContext.OnModelCreating`.
+- Leads are ordered by `Position DESC` — the highest position value appears at the top of a column.
+- When creating a new lead at the top: `generateKeyBetween(currentTopPos, null)`.
+- When moving a card between two others: `generateKeyBetween(belowPos, abovePos)` — arguments are swapped relative to the library's default because the display order is descending.
+- Cursor-based pagination within a column uses `afterPosition`: the next page contains leads with `Position < afterPosition` (descending order).
+
 
 ### Technologies Used
 - .NET Core 9 API as backend API
@@ -31,7 +40,7 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 ## Backend Design:
 - MVC (Model View Controller)
 - TODO: talk about error handling here: we use exceptions, etc.
-- **Model configuration**: Prefer data annotations over Fluent API. Place `[ForeignKey]`, `[DeleteBehavior]`, and `[Index]` directly on model properties/classes (namespaces: `System.ComponentModel.DataAnnotations.Schema`, `Microsoft.EntityFrameworkCore`). Exception: `OwnsMany(...).ToJson()` for JSON-stored owned collections must remain in `OnModelCreating` — no data annotation equivalent exists.
+- **Model configuration**: Prefer data annotations over Fluent API. Place `[ForeignKey]`, `[DeleteBehavior]`, and `[Index]` directly on model properties/classes (namespaces: `System.ComponentModel.DataAnnotations.Schema`, `Microsoft.EntityFrameworkCore`). Exceptions that must use Fluent API in `OnModelCreating`: `OwnsMany(...).ToJson()` for JSON-stored owned collections, and `UseCollation(...)` for column collation — neither has a data annotation equivalent.
 
 ## Backend Models:
 - User: represents a user that can login and use the platform.

@@ -1,4 +1,4 @@
-import type { Board, PagedResponse } from '../models/Domain'
+import type { Board, BoardDetailResponse, PagedResponse } from '../models/Domain'
 import { backendAPI, type APIResponse } from './backendService'
 
 const PAGE_SIZE = parseInt(import.meta.env.VITE_PAGE_SIZE ?? '20')
