@@ -2,20 +2,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
 using WebAPI.Authorization;
 using WebAPI.Configuration;
 using WebAPI.Data;
 using WebAPI.Dtos;
 using WebAPI.Errors;
 using WebAPI.Models;
+using WebAPI.Services;
 
 namespace WebAPI.Controllers
 {
     [Authorize]
     [Route("api/leads")]
     [ApiController]
-    public class LeadsController(DataContext context, IOptions<PaginationOptions> paginationOptions) : ControllerBase
+    public class LeadsController(
+        DataContext context,
+        AuthService authService,
+        IOptions<PaginationOptions> paginationOptions) : ControllerBase
     {
         private readonly PaginationOptions _pagination = paginationOptions.Value;
 
@@ -92,7 +95,14 @@ namespace WebAPI.Controllers
             var board = await context.Boards.FindAsync(request.BoardId)
                 ?? throw new NotFoundException("Quadro não encontrado.");
 
-            var lead = request.ToEntity(GetCurrentUserEmail());
+            User? userAssigned = null;
+            if (request.AssignedToUserGuid is not null)
+            {
+                userAssigned = await context.Users.FindAsync(request.AssignedToUserGuid)
+                ?? throw new NotFoundException("Usuário não encontrado.");
+            }
+
+            var lead = request.ToEntity(authService.GetUserClaims(HttpContext), userAssigned);
             lead.Validate(board);
 
             context.Leads.Add(lead);
@@ -110,7 +120,15 @@ namespace WebAPI.Controllers
             var board = await context.Boards.FindAsync(request.BoardId)
                 ?? throw new NotFoundException("Quadro não encontrado.");
 
-            lead.UpdateFromRequest(request, GetCurrentUserEmail());
+            User? userAssigned = null;
+            var isNewUserAssignment = request.AssignedToUserGuid != lead.AssignedToUserGuid;
+            if (isNewUserAssignment && request.AssignedToUserGuid != null)
+            {
+                userAssigned = await context.Users.FindAsync(request.AssignedToUserGuid)
+                    ?? throw new NotFoundException("Usuário não encontrado.");
+            }
+            lead.UpdateFromRequest(request, authService.GetUserClaims(HttpContext), isNewUserAssignment, userAssigned);
+
             lead.Validate(board);
 
             context.Entry(lead).State = EntityState.Modified;
@@ -128,12 +146,6 @@ namespace WebAPI.Controllers
             context.Leads.Remove(lead);
             await context.SaveChangesAsync();
             return NoContent();
-        }
-
-        private string GetCurrentUserEmail()
-        {
-            return HttpContext.User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
         }
     }
 }

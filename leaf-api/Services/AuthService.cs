@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using WebAPI.Configuration;
 using WebAPI.Data;
+using WebAPI.Dtos;
 using WebAPI.Dtos.Auth;
 using WebAPI.Errors;
 using WebAPI.Models;
@@ -185,6 +187,7 @@ namespace WebAPI.Services
             var claims = new List<Claim>
             {
                 new(ClaimTypes.Email, user.Email),
+                new(ClaimTypes.Name, user.Name),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
 
@@ -232,6 +235,36 @@ namespace WebAPI.Services
         {
             string userId = httpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             return new Guid(userId);
+        }
+
+        public UserClaims GetUserClaims(HttpContext httpContext)
+        {
+            Guid? id = null;
+            string? name = null;
+            string? email = null;
+            foreach(var c in httpContext.User.Claims)
+            {
+                switch (c.Type)
+                {
+                    case ClaimTypes.NameIdentifier:
+                        id = new Guid(c.Value);
+                        break;
+                    case ClaimTypes.Name:
+                        name = c.Value;
+                        break;
+                    case ClaimTypes.Email:
+                        email = c.Value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (id == null || name == null || email == null) throw new UnauthorizedException("JWT token desatualizado. Faça login novamente.");
+            return new UserClaims {
+                Id = (Guid) id,
+                Name = name,
+                Email = email
+            };
         }
 
         public async Task<User> GetUser(HttpContext httpContext)

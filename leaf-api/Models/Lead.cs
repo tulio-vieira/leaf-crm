@@ -33,8 +33,15 @@ namespace WebAPI.Models
 
         public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
 
+        public required Guid ChangedByUserGuid { get; set; }
+
         [StringLength(60)]
-        public string ChangedBy { get; set; } = string.Empty;
+        public required string ChangedByUserName { get; set; }
+
+        public Guid? AssignedToUserGuid { get; set; }
+
+        [StringLength(60)]
+        public string? AssignedToUserName { get; set; }
 
         public void Validate(Board board)
         {
@@ -42,7 +49,12 @@ namespace WebAPI.Models
                 throw new ServiceException("Índice de coluna inválido para este quadro.");
         }
 
-        public void UpdateFromRequest(LeadRequest r, string changedBy)
+        public void UpdateFromRequest(
+            LeadRequest r,
+            UserClaims c,
+            bool isNewUserAssignment,
+            User? userAssigned
+        )
         {
             Name = r.Name;
             Description = r.Description;
@@ -50,7 +62,20 @@ namespace WebAPI.Models
             ColumnIdx = r.ColumnIdx;
             Position = r.Position;
             ModifiedAt = DateTime.UtcNow;
-            ChangedBy = changedBy;
+            ChangedByUserGuid = c.Id;
+            ChangedByUserName = c.Name;
+            if (isNewUserAssignment)
+            {
+                if (userAssigned == null)
+                {
+                    AssignedToUserGuid = null;
+                    AssignedToUserName = null;
+                } else
+                {
+                    AssignedToUserName = userAssigned.Name;
+                    AssignedToUserGuid = userAssigned.Id;
+                }
+            }
         }
     }
 }

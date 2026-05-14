@@ -14,17 +14,26 @@ namespace WebAPI.Dtos
 
         public required string Position { get; set; }
 
-        public Lead ToEntity(string changedBy)
+        public Guid? AssignedToUserGuid { get; set; }
+
+
+        public Lead ToEntity(UserClaims c, User? userAssigned)
         {
-            return new Lead()
+            var lead = new Lead()
             {
                 Name = Name,
                 Description = Description,
                 BoardId = BoardId,
                 ColumnIdx = ColumnIdx,
                 Position = Position,
-                ChangedBy = changedBy
+                ChangedByUserGuid = c.Id,
+                ChangedByUserName = c.Name,
             };
+            if (userAssigned != null) {
+                lead.AssignedToUserGuid = userAssigned.Id;
+                lead.AssignedToUserName = userAssigned.Name;
+            }
+            return lead;
         }
     }
 }
