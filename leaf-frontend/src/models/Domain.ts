@@ -14,6 +14,11 @@ export interface BoardDetailResponse {
   columnCounts: number[]
 }
 
+export interface UserOption {
+  id: string
+  name: string
+}
+
 export interface Lead {
   id: number
   name: string
@@ -25,6 +30,8 @@ export interface Lead {
   createdAt: string
   modifiedAt: string
   changedBy: string
+  assignedToUserGuid?: string | null
+  assignedToUserName?: string | null
 }
 
 export interface PagedResponse<T> {

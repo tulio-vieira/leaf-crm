@@ -1,4 +1,4 @@
-import type { PagedResponse, UserListItem } from '../models/Domain'
+import type { PagedResponse, UserListItem, UserOption } from '../models/Domain'
 import { backendAPI, type APIResponse } from './backendService'
 
 const PAGE_SIZE = parseInt(import.meta.env.VITE_PAGE_SIZE ?? '20')
@@ -8,6 +8,17 @@ export interface UserRequest {
   email: string
   isEmailConfirmed: boolean
   roleId: string | null
+}
+
+export async function searchUsers(name: string): Promise<APIResponse<UserOption[]>> {
+  try {
+    const params: Record<string, unknown> = { pageSize: 20 }
+    if (name) params.name = name
+    const res = await backendAPI.get<PagedResponse<UserListItem>>('list/users', params)
+    return { data: res.data.items.map(u => ({ id: u.id, name: u.name })) }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
 }
 
 export async function listUsers(page: number = 1, roleId?: string): Promise<APIResponse<PagedResponse<UserListItem>>> {

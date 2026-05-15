@@ -12,11 +12,12 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
-import type { Board, Lead } from '../../models/Domain'
+import type { Board, Lead, UserOption } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { generateKeyBetween } from 'fractional-indexing'
 import { listAllBoards } from '../../services/boardService'
 import { createLead, updateLead } from '../../services/leadService'
+import UserDropdown from '../UserDropdown'
 
 interface Props {
   lead?: Lead
@@ -33,6 +34,11 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
   const [description, setDescription] = useState(lead?.description ?? '')
   const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? currBoard?.id ?? '')
   const [columnIdx, setColumnIdx] = useState<number | ''>(lead?.columnIdx ?? '')
+  const [assignedToUser, setAssignedToUser] = useState<UserOption | null>(
+    lead?.assignedToUserGuid && lead?.assignedToUserName
+      ? { id: lead.assignedToUserGuid, name: lead.assignedToUserName }
+      : null
+  )
 
   const [formState, setFormState] = useState<PageState>({})
   const [boardsState, setBoardsState] = useState<PageState<Board[]>>({ isLoading: true })
@@ -56,6 +62,11 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
     setDescription(lead?.description ?? '')
     setBoardId(lead?.boardId ?? '')
     setColumnIdx(lead?.columnIdx ?? '')
+    setAssignedToUser(
+      lead?.assignedToUserGuid && lead?.assignedToUserName
+        ? { id: lead.assignedToUserGuid, name: lead.assignedToUserName }
+        : null
+    )
   }, [lead])
 
   const selectedBoard = currBoard ? currBoard : boardsState.data?.find(b => b.id === boardId) ?? null
@@ -71,7 +82,7 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
       position = generateKeyBetween(highestPos, null)
     }
 
-    const data = { name, description, boardId: boardId as number, columnIdx: columnIdx as number, position }
+    const data = { name, description, boardId: boardId as number, columnIdx: columnIdx as number, position, assignedToUserGuid: assignedToUser?.id ?? null }
     const res = isEdit ? await updateLead(lead!.id, data) : await createLead(data)
     if (res.errMsg) {
       setFormState({ errMsg: res.errMsg })
@@ -105,6 +116,12 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
             fullWidth
             multiline
             rows={3}
+            disabled={formState.isLoading}
+          />
+
+          <UserDropdown
+            value={assignedToUser}
+            onChange={setAssignedToUser}
             disabled={formState.isLoading}
           />
 

@@ -27,7 +27,8 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\vieir\\\\Documents\\\\learning\\\\leaf-project\\\\leaf-crm\\\\leaf-frontend\\\\node_modules\\\\react-kanban-kit\" -Recurse -Depth 2)",
       "Bash(Select-Object -First 50)",
       "Bash(xargs grep -l \"class LeadRequest\")",
-      "Bash(grep -E \"\\\\.cs$\")"
+      "Bash(grep -E \"\\\\.cs$\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\vieir\\\\Documents\\\\learning\\\\leaf-project\\\\leaf-crm\\\\leaf-frontend\\\\src\" -Directory)"
     ]
   }
 }

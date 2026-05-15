@@ -9,6 +9,7 @@ export interface LeadRequest {
   boardId: number
   columnIdx: number
   position?: string
+  assignedToUserGuid?: string | null
 }
 
 export async function listLeads(params: { page?: number; boardId?: number }): Promise<APIResponse<PagedResponse<Lead>>> {

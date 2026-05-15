@@ -17,6 +17,40 @@ public class ListController(DataContext context, IOptions<PaginationOptions> pag
 {
     private readonly PaginationOptions _pagination = paginationOptions.Value;
 
+    [HttpGet("users")]
+    [RequirePermission("leads:write")]
+    public async Task<PagedResponse<UserResponse>> ListUsersForAssignment(
+        [FromQuery] string? name = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 0)
+    {
+        if (pageSize <= 0) pageSize = _pagination.DefaultPageSize;
+        if (pageSize > _pagination.MaxPageSize) pageSize = _pagination.MaxPageSize;
+        if (page < 1) page = 1;
+
+        var query = context.Users.Include(u => u.Role).AsQueryable();
+        if (!string.IsNullOrEmpty(name))
+            query = query.Where(u => EF.Functions.ILike(u.Name, $"%{name}%"));
+        query = query.OrderBy(u => u.Name);
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize + 1)
+            .Select(u => u.ToResponse())
+            .ToListAsync();
+
+        var hasNextPage = items.Count > pageSize;
+        if (hasNextPage) items.RemoveAt(items.Count - 1);
+
+        return new PagedResponse<UserResponse>
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            HasNextPage = hasNextPage
+        };
+    }
+
     [HttpGet("notifications")]
     [RequirePermission("notifications:read")]
     public async Task<PagedResponse<Notification>> ListNotifications(
