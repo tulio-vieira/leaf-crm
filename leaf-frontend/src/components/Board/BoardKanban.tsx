@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
 import { useTheme } from '@mui/material/styles'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -14,6 +13,7 @@ import type { PageState } from '../../models/PageState'
 import { listColumnLeads, updateLead } from '../../services/leadService'
 import LeadCard from './LeadCard';
 import { Button } from '@mui/material';
+import LeadForm from '../Lead/LeadForm';
 
 type ConfigMap = BoardProps['configMap']
 type DropCardParams = Parameters<Required<BoardProps>['onCardMove']>[0]
@@ -73,16 +73,16 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
 }
 
 function BoardKanban({ board, leads }: Props) {
-  const navigate = useNavigate()
   const theme = useTheme()
   const [boardData, setBoardData] = useState<BoardData>(() => buildBoardData(board, leads))
   const [reqState, setReqState] = useState<PageState<string>>({})
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 
   const configMap: ConfigMap = {
     lead: {
       render: ({ data }: { data: BoardItem }) => {
         const lead = data.content as Lead
-        return <LeadCard lead={lead} theme={theme}/>
+        return <LeadCard lead={lead} theme={theme} />
       },
       isDraggable: true,
     },
@@ -186,7 +186,7 @@ function BoardKanban({ board, leads }: Props) {
         dataSource={boardData}
         configMap={configMap}
         onCardMove={handleCardMove}
-        onCardClick={(_, card) => navigate(`/leads/${card.id}`)}
+        onCardClick={(_, card) => setSelectedLead(card.content)}
         renderSkeletonCard={({column}) => (
           <Paper elevation={2} sx={{ p: 1.5, borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
             <Button onClick={() => handleLoadMore(column)}>Carregar Mais</Button>
@@ -217,6 +217,14 @@ function BoardKanban({ board, leads }: Props) {
           gap: 8,
         })}
       />
+
+      {selectedLead && (
+        <LeadForm
+          lead={selectedLead}
+          onSuccess={() => { setSelectedLead(null) }}
+          onCancel={() => setSelectedLead(null)}
+        />
+      )}
 
       <Snackbar
         open={reqState.errMsg !== undefined}

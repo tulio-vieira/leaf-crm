@@ -52,10 +52,10 @@ function LeadDetail() {
     <Box>
       <Button
         startIcon={<ArrowBackIcon />}
-        onClick={() => navigate('/leads')}
+        onClick={() => navigate(-1)}
         sx={{ mb: 2 }}
       >
-        Voltar aos Leads
+        Voltar
       </Button>
 
       {leadState.isLoading && (

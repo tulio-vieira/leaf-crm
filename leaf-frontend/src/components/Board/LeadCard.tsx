@@ -39,7 +39,7 @@ function LeadCard({ lead, theme }: Props) {
         {`Criado por: ${lead.createdByUserName}`}
       </Typography>
       <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mt: 0.5 }}>
-        {`Responsável: · ${lead.assignedToUserName}`}
+        {`Responsável: ${lead.assignedToUserName}`}
       </Typography>
     </Paper>
   )
