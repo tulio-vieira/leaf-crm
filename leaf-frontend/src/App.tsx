@@ -17,6 +17,7 @@ import LeadScreen from './pages/LeadScreen'
 import LeadDetail from './pages/LeadDetail'
 import BoardScreen from './pages/BoardScreen'
 import BoardDetail from './pages/BoardDetail'
+import UserDetail from './pages/UserDetail'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/admin" element={<PrivateRoute Component={AdminScreen} />} />
           <Route path="/leads" element={<PrivateRoute Component={LeadScreen} />} />
           <Route path="/leads/:id" element={<PrivateRoute Component={LeadDetail} />} />
+          <Route path="/users/:id" element={<PrivateRoute Component={UserDetail} />} />
           <Route path="/boards" element={<PrivateRoute Component={BoardScreen} />} />
           <Route path="/boards/:id" element={<PrivateRoute Component={BoardDetail} />} />
           <Route element={<NotFound />} />

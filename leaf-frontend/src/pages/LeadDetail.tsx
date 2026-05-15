@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
+import Link from '@mui/material/Link'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -92,7 +93,7 @@ function LeadDetail() {
           <Stack spacing={1.5}>
             <Box>
               <Typography variant="caption" color="text.secondary">Descrição</Typography>
-              <Typography variant="body1">{lead.description || '—'}</Typography>
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{lead.description || '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Quadro</Typography>
@@ -111,6 +112,14 @@ function LeadDetail() {
               </Typography>
             </Box>
             <Box>
+              <Typography variant="caption" color="text.secondary">Criado por</Typography>
+              <Typography variant="body1">
+                {lead.createdByUserGuid
+                  ? <Link component={RouterLink} to={`/users/${lead.createdByUserGuid}`} underline="hover">{lead.createdByUserName}</Link>
+                  : (lead.createdByUserName || '—')}
+              </Typography>
+            </Box>
+            <Box>
               <Typography variant="caption" color="text.secondary">Última modificação</Typography>
               <Typography variant="body1">
                 {new Date(lead.modifiedAt).toLocaleString('pt-BR')}
@@ -118,7 +127,11 @@ function LeadDetail() {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Alterado por</Typography>
-              <Typography variant="body1">{lead.changedBy || '—'}</Typography>
+              <Typography variant="body1">
+                {lead.changedByUserGuid
+                  ? <Link component={RouterLink} to={`/users/${lead.changedByUserGuid}`} underline="hover">{lead.changedByUserName}</Link>
+                  : (lead.changedByUserName || '—')}
+              </Typography>
             </Box>
           </Stack>
         </Paper>

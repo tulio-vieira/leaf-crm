@@ -29,7 +29,10 @@ export interface Lead {
   position: string
   createdAt: string
   modifiedAt: string
-  changedBy: string
+  createdByUserGuid: string
+  createdByUserName: string
+  changedByUserGuid: string
+  changedByUserName: string
   assignedToUserGuid?: string | null
   assignedToUserName?: string | null
 }

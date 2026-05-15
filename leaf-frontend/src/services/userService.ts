@@ -10,6 +10,15 @@ export interface UserRequest {
   roleId: string | null
 }
 
+export async function getUser(userId: string): Promise<APIResponse<UserListItem>> {
+  try {
+    const res = await backendAPI.get<UserListItem>(`users/${userId}`)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}
+
 export async function searchUsers(name: string): Promise<APIResponse<UserOption[]>> {
   try {
     const params: Record<string, unknown> = { pageSize: 20 }

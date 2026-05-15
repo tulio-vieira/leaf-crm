@@ -27,13 +27,15 @@ function LeadList({ leads, hasNextPage, onChanged }: Props) {
               <TableCell>Descrição</TableCell>
               <TableCell>Quadro</TableCell>
               <TableCell>Criado em</TableCell>
+              <TableCell>Criado por</TableCell>
+              <TableCell>Responsável</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {leads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5}>
+                <TableCell colSpan={7}>
                   <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
                     Nenhum lead encontrado.
                   </Typography>

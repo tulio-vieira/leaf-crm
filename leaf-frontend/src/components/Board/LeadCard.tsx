@@ -23,9 +23,6 @@ function LeadCard({ lead, theme }: Props) {
       <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
         {lead.name}
       </Typography>
-      <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
-        Position: {lead.position}
-      </Typography>
       {lead.description && (
         <Typography
           variant="caption"
@@ -35,6 +32,15 @@ function LeadCard({ lead, theme }: Props) {
           {lead.description}
         </Typography>
       )}
+      <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mt: 0.5 }}>
+        {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
+      </Typography>
+      <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mt: 0.5 }}>
+        {`Criado por: ${lead.createdByUserName}`}
+      </Typography>
+      <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mt: 0.5 }}>
+        {`Responsável: · ${lead.assignedToUserName}`}
+      </Typography>
     </Paper>
   )
 }

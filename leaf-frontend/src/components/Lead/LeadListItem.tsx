@@ -53,6 +53,8 @@ function LeadListItem({ lead, onChanged }: Props) {
         <TableCell>{truncatedDesc}</TableCell>
         <TableCell>{boardName}</TableCell>
         <TableCell>{createdAt}</TableCell>
+        <TableCell>{lead.createdByUserName ?? '—'}</TableCell>
+        <TableCell>{lead.assignedToUserName ?? '—'}</TableCell>
         <TableCell align="right">
           <Tooltip title="Editar">
             <IconButton size="small" onClick={e => { e.stopPropagation(); setShowEditForm(true) }}>

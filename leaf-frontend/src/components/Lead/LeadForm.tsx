@@ -22,7 +22,7 @@ import UserDropdown from '../UserDropdown'
 interface Props {
   lead?: Lead
   currBoard?: Board
-  columnCursors: Record<number, string | undefined>
+  columnCursors?: Record<number, string | undefined>
   onSuccess: () => void
   onCancel: () => void
 }
@@ -78,7 +78,7 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
 
     let position: string | undefined = lead?.position
     if (!isEdit) {
-      const highestPos = columnCursors[columnIdx]
+      const highestPos = columnCursors ? columnCursors[columnIdx] : null
       position = generateKeyBetween(highestPos, null)
     }
 

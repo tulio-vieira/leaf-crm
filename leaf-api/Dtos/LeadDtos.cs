@@ -28,6 +28,8 @@ namespace WebAPI.Dtos
                 Position = Position,
                 ChangedByUserGuid = c.Id,
                 ChangedByUserName = c.Name,
+                CreatedByUserGuid = c.Id,
+                CreatedByUserName = c.Name,
             };
             if (userAssigned != null) {
                 lead.AssignedToUserGuid = userAssigned.Id;

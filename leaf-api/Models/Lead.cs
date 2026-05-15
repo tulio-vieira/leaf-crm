@@ -38,6 +38,11 @@ namespace WebAPI.Models
         [StringLength(60)]
         public required string ChangedByUserName { get; set; }
 
+        public required Guid CreatedByUserGuid { get; set; }
+
+        [StringLength(60)]
+        public required string CreatedByUserName { get; set; }
+
         public Guid? AssignedToUserGuid { get; set; }
 
         [StringLength(60)]
