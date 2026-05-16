@@ -10,6 +10,8 @@ namespace WebAPI.Dtos
 
         public required int BoardId { get; set; }
 
+        public required int CustomerId { get; set; }
+
         public required int ColumnIdx { get; set; }
 
         public required string Position { get; set; }
@@ -24,6 +26,7 @@ namespace WebAPI.Dtos
                 Name = Name,
                 Description = Description,
                 BoardId = BoardId,
+                CustomerId = CustomerId,
                 ColumnIdx = ColumnIdx,
                 Position = Position,
                 ChangedByUserGuid = c.Id,

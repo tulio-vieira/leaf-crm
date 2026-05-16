@@ -11,6 +11,7 @@ namespace WebAPI.Data
         public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
         public DbSet<Board> Boards { get; set; }
         public DbSet<Lead> Leads { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

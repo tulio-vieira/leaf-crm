@@ -25,6 +25,12 @@ namespace WebAPI.Models
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public Board? Board { get; set; }
 
+        public required int CustomerId { get; set; }
+
+        [ForeignKey(nameof(CustomerId))]
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public Customer? Customer { get; set; }
+
         public required int ColumnIdx { get; set; }
 
         public required string Position { get; set; }

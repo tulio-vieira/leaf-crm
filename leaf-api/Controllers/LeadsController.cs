@@ -95,6 +95,9 @@ namespace WebAPI.Controllers
             var board = await context.Boards.FindAsync(request.BoardId)
                 ?? throw new NotFoundException("Quadro não encontrado.");
 
+            _ = await context.Customers.FindAsync(request.CustomerId)
+                ?? throw new NotFoundException("Cliente não encontrado.");
+
             User? userAssigned = null;
             if (request.AssignedToUserGuid is not null)
             {
