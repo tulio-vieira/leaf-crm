@@ -3,13 +3,16 @@ import { backendAPI, type APIResponse } from './backendService'
 
 const PAGE_SIZE = parseInt(import.meta.env.VITE_PAGE_SIZE ?? '20')
 
-export interface LeadRequest {
-  name: string
+export interface LeadUpdateRequest {
   description?: string
   boardId: number
   columnIdx: number
   position?: string
   assignedToUserGuid?: string | null
+}
+
+export interface LeadCreateRequest extends LeadUpdateRequest {
+  customerId: number
 }
 
 export async function listLeads(params: { page?: number; boardId?: number }): Promise<APIResponse<PagedResponse<Lead>>> {
@@ -33,7 +36,7 @@ export async function getLead(id: number): Promise<APIResponse<Lead>> {
   }
 }
 
-export async function createLead(data: LeadRequest): Promise<APIResponse<Lead>> {
+export async function createLead(data: LeadCreateRequest): Promise<APIResponse<Lead>> {
   try {
     const res = await backendAPI.post<Lead>('leads', data)
     return { data: res.data }
@@ -42,7 +45,7 @@ export async function createLead(data: LeadRequest): Promise<APIResponse<Lead>> 
   }
 }
 
-export async function updateLead(id: number, data: LeadRequest): Promise<APIResponse<Lead>> {
+export async function updateLead(id: number, data: LeadUpdateRequest): Promise<APIResponse<Lead>> {
   try {
     const res = await backendAPI.put<Lead>(`leads/${id}`, data)
     return { data: res.data }

@@ -24,13 +24,17 @@ namespace WebAPI.Controllers
         [RequirePermission("customers:read")]
         public async Task<PagedResponse<Customer>> ListCustomers(
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 0)
+            [FromQuery] int pageSize = 0,
+            [FromQuery] string? name = null)
         {
             if (pageSize <= 0) pageSize = _pagination.DefaultPageSize;
             if (pageSize > _pagination.MaxPageSize) pageSize = _pagination.MaxPageSize;
             if (page < 1) page = 1;
 
-            var query = context.Customers.OrderBy(c => c.Name);
+            var query = context.Customers.OrderBy(c => c.Name).AsQueryable();
+
+            if (name != null)
+                query = query.Where(c => EF.Functions.ILike(c.Name, $"%{name}%"));
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize + 1)

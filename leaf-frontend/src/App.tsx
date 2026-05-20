@@ -18,6 +18,8 @@ import LeadDetail from './pages/LeadDetail'
 import BoardScreen from './pages/BoardScreen'
 import BoardDetail from './pages/BoardDetail'
 import UserDetail from './pages/UserDetail'
+import CustomerScreen from './pages/CustomerScreen'
+import CustomerDetail from './pages/CustomerDetail'
 
 function App() {
   return (
@@ -39,6 +41,8 @@ function App() {
           <Route path="/users/:id" element={<PrivateRoute Component={UserDetail} />} />
           <Route path="/boards" element={<PrivateRoute Component={BoardScreen} />} />
           <Route path="/boards/:id" element={<PrivateRoute Component={BoardDetail} />} />
+          <Route path="/customers" element={<PrivateRoute Component={CustomerScreen} />} />
+          <Route path="/customers/:id" element={<PrivateRoute Component={CustomerDetail} />} />
           <Route element={<NotFound />} />
         </Routes>
       </Layout>

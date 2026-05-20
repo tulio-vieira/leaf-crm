@@ -12,11 +12,12 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
-import type { Board, Lead, UserOption } from '../../models/Domain'
+import type { Board, CustomerOption, Lead, UserOption } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { generateKeyBetween } from 'fractional-indexing'
 import { listAllBoards } from '../../services/boardService'
 import { createLead, updateLead } from '../../services/leadService'
+import CustomerDropdown from '../CustomerDropdown'
 import UserDropdown from '../UserDropdown'
 
 interface Props {
@@ -30,7 +31,11 @@ interface Props {
 function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props) {
   const isEdit = lead !== undefined
 
-  const [name, setName] = useState(lead?.name ?? '')
+  const [customer, setCustomer] = useState<CustomerOption | null>(
+    lead?.customerId && lead?.customerName
+      ? { id: Number(lead.customerId), name: lead.customerName }
+      : null
+  )
   const [description, setDescription] = useState(lead?.description ?? '')
   const [boardId, setBoardId] = useState<number | ''>(lead?.boardId ?? currBoard?.id ?? '')
   const [columnIdx, setColumnIdx] = useState<number | ''>(lead?.columnIdx ?? '')
@@ -45,7 +50,7 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
 
   useEffect(() => {
     if (currBoard) {
-      return setBoardsState({data: [currBoard]})
+      return setBoardsState({ data: [currBoard] })
     }
     listAllBoards().then(res => {
       if (res.errMsg) {
@@ -58,7 +63,11 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
 
   useEffect(() => {
     if (!lead) return
-    setName(lead?.name ?? '')
+    setCustomer(
+      lead.customerId && lead.customerName
+        ? { id: Number(lead.customerId), name: lead.customerName }
+        : null
+    )
     setDescription(lead?.description ?? '')
     setBoardId(lead?.boardId ?? '')
     setColumnIdx(lead?.columnIdx ?? '')
@@ -74,16 +83,20 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     if (boardId === '' || columnIdx === '') return
+    if (!isEdit && !customer) return
     setFormState({ isLoading: true })
 
     let position: string | undefined = lead?.position
     if (!isEdit) {
-      const highestPos = columnCursors ? columnCursors[columnIdx] : null
+      const highestPos = columnCursors ? columnCursors[columnIdx as number] : null
       position = generateKeyBetween(highestPos, null)
     }
 
-    const data = { name, description, boardId: boardId as number, columnIdx: columnIdx as number, position, assignedToUserGuid: assignedToUser?.id ?? null }
-    const res = isEdit ? await updateLead(lead!.id, data) : await createLead(data)
+    const baseData = { description, boardId: boardId as number, columnIdx: columnIdx as number, position, assignedToUserGuid: assignedToUser?.id ?? null }
+    const res = isEdit
+      ? await updateLead(lead!.id, baseData)
+      : await createLead({ ...baseData, customerId: customer!.id })
+
     if (res.errMsg) {
       setFormState({ errMsg: res.errMsg })
     } else {
@@ -100,13 +113,10 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
           {boardsState.errMsg && <Alert severity="error">{boardsState.errMsg}</Alert>}
           {formState.errMsg && <Alert severity="error">{formState.errMsg}</Alert>}
 
-          <TextField
-            label="Nome"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-            fullWidth
-            disabled={formState.isLoading}
+          <CustomerDropdown
+            value={customer}
+            onChange={setCustomer}
+            disabled={isEdit || formState.isLoading}
           />
 
           <TextField
@@ -160,7 +170,7 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={formState.isLoading || boardsState.isLoading || !name || boardId === undefined || columnIdx === undefined}
+          disabled={formState.isLoading || boardsState.isLoading || (!isEdit && !customer) || boardId === '' || columnIdx === ''}
         >
           {formState.isLoading ? <CircularProgress size={20} color="inherit" /> : isEdit ? 'Salvar' : 'Criar'}
         </Button>

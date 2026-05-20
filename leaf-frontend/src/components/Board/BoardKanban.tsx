@@ -60,7 +60,7 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
     `${lead.id}`,
     {
       id: `${lead.id}`,
-      title: lead.name,
+      title: lead.customerName,
       parentId: `col-${lead.columnIdx}`,
       children: [],
       totalChildrenCount: 0,
@@ -109,7 +109,7 @@ function BoardKanban({ board, leads }: Props) {
       `${lead.id}`,
       {
         id: `${lead.id}`,
-        title: lead.name,
+        title: lead.customerName,
         parentId: column.id,
         children: [],
         totalChildrenCount: 0,

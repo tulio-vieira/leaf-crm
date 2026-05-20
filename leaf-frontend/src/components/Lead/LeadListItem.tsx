@@ -47,7 +47,7 @@ function LeadListItem({ lead, onChanged }: Props) {
       <TableRow hover>
         <TableCell>
           <Link component={RouterLink} to={`/leads/${lead.id}`} underline="hover">
-            {lead.name}
+            {lead.customerName}
           </Link>
         </TableCell>
         <TableCell>{truncatedDesc}</TableCell>
@@ -80,7 +80,7 @@ function LeadListItem({ lead, onChanged }: Props) {
       <ConfirmDialog
         open={showDelete}
         title="Excluir Lead"
-        message={`Deseja excluir o lead "${lead.name}"? Esta ação não pode ser desfeita.`}
+        message={`Deseja excluir o lead de "${lead.customerName}"? Esta ação não pode ser desfeita.`}
         onConfirm={handleDelete}
         onCancel={() => { setShowDelete(false); setDeleteState({}) }}
         isLoading={deleteState.isLoading}

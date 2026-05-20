@@ -5,11 +5,12 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 ## Language & Currency
 - All user-facing text (frontend labels, buttons, error messages, form fields, table headers, etc.) must be in **Brazilian Portuguese**.
 - Currency is displayed and entered as **Brazilian Real** (R$ 80,00 format) on the frontend. Internally, prices are stored as integer cents (`PriceCents` field).
-- Entity terminology: Leads (Leads), Users (Usuários), Roles (Cargos).
+- Entity terminology: Leads (Leads), Users (Usuários), Roles (Cargos), Customers (Clientes).
 
 
 ## Core Features
-- The platform allows us to manage Leads. We can view leads in either a list (`/leads`) or kanban board (`/boards/:id`).
+- The platform allows us to manage Leads and Customers. Leads can be viewed in a list (`/leads`) or kanban board (`/boards/:id`). Customers are managed at `/customers`.
+- A **Customer** represents a real person or company. Each customer can have multiple Leads — one per sale or funnel. A Lead's customer is set at creation time and cannot be changed.
 - Granular permission-based authorization controls access to all API endpoints. Each user can have one Role that stores their permissions.
 
 ### Boards and Leads — Kanban Model
@@ -46,7 +47,8 @@ This repository holds the files for the Leaf CRM project. Leaf CRM is a web plat
 - User: represents a user that can login and use the platform.
 - Role: represents a set of permissions for a User. One Role per User (1:1). Fields: UserGuid (FK, PK), Permissions (semicolon-separated string), CreatedAt, ModifiedAt, ChangedBy (email of last editor).
 - Board: a sales funnel with a name, optional description, and an ordered list of Column stages (stored as JSON via `OwnsMany(...).ToJson()`). Validation: at least 1 column, unique column names.
-- Lead: belongs to a Board (`BoardId` FK) and a column position (`ColumnIdx`, 0-based index into `Board.Columns`). Fields: Name, Description, BoardId, ColumnIdx, CreatedAt, ModifiedAt, ChangedBy. Cascade delete from Board.
+- Customer: represents a real person or company. Fields: Id (int), Name (required), Description, Email, PhoneNumber, Address, Company, CreatedAt, ModifiedAt. Managed at `/customers`. Permissions: `customers:read`, `customers:write`, `customers:delete`.
+- Lead: belongs to a Board (`BoardId` FK) and a Customer (`CustomerId` FK, required, immutable after creation). Sits in one column (`ColumnIdx`, 0-based index into `Board.Columns`). Fields: Description, BoardId, ColumnIdx, CustomerId, CustomerName (denormalized), CreatedAt, ModifiedAt, ChangedBy. Cascade delete from Board. `DeleteBehavior.Restrict` on Customer — cannot delete a customer who has leads. Lead cards and list items display `CustomerName` as the title.
 
 
 ### Wildcard Matching
@@ -88,9 +90,19 @@ It is a generic, reusable component that accepts a declarative `filterItems` con
 Whenever we use frontend queries, we shoud use QueryFilters component. We should consider expanding QueryFilters if it doesn't suite our use cases.
 
 
+## Reusable Dropdown Components
+
+When a form field requires searching and selecting an entity, create a dedicated dropdown component following the `UserDropdown` / `CustomerDropdown` pattern:
+- Uses MUI `Autocomplete` with a debounced search (400ms via `useDebounce`)
+- Props: `value: Option | null, onChange, disabled?`
+- Calls a `search*` function from the entity's service on input change
+- `filterOptions={x => x}` disables client-side filtering (server handles it)
+
+Existing dropdowns: `UserDropdown` (`searchUsers`), `CustomerDropdown` (`searchCustomers`).
+
 ## Frontend Entity Management Pattern
 
-Every new manageable entity (e.g. Lead, Board, Customer) must follow this structure. The **Leads** implementation (`LeadScreen`, `LeadDetail`, `LeadForm`, `LeadList`, `LeadListItem`, `leadService.ts`) is the canonical reference.
+Every new manageable entity (e.g. Lead, Board, Customer) must follow this structure. The **Leads** and **Customers** implementations are the canonical references.
 
 ### 1. Domain type
 Add the entity interface to `src/models/Domain.ts`.

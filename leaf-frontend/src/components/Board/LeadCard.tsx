@@ -21,7 +21,7 @@ function LeadCard({ lead, theme }: Props) {
       }}
     >
       <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
-        {lead.name}
+        {lead.customerName}
       </Typography>
       {lead.description && (
         <Typography
@@ -29,7 +29,7 @@ function LeadCard({ lead, theme }: Props) {
           color="text.secondary"
           sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
-          {lead.description}
+          {lead.description.length > 60 ? lead.description.slice(0, 60) + '…' : lead.description}
         </Typography>
       )}
       <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mt: 0.5 }}>

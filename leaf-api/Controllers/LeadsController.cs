@@ -90,12 +90,12 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [RequirePermission("leads:write")]
-        public async Task<ActionResult<Lead>> CreateLead(LeadRequest request)
+        public async Task<ActionResult<Lead>> CreateLead(LeadCreateRequest request)
         {
             var board = await context.Boards.FindAsync(request.BoardId)
                 ?? throw new NotFoundException("Quadro não encontrado.");
 
-            _ = await context.Customers.FindAsync(request.CustomerId)
+            var customer = await context.Customers.FindAsync(request.CustomerId)
                 ?? throw new NotFoundException("Cliente não encontrado.");
 
             User? userAssigned = null;
@@ -105,7 +105,7 @@ namespace WebAPI.Controllers
                 ?? throw new NotFoundException("Usuário não encontrado.");
             }
 
-            var lead = request.ToEntity(authService.GetUserClaims(HttpContext), userAssigned);
+            var lead = request.ToEntity(authService.GetUserClaims(HttpContext), userAssigned, customer);
             lead.Validate(board);
 
             context.Leads.Add(lead);
@@ -115,7 +115,7 @@ namespace WebAPI.Controllers
 
         [HttpPut("{id}")]
         [RequirePermission("leads:write")]
-        public async Task<Lead> UpdateLead(int id, LeadRequest request)
+        public async Task<Lead> UpdateLead(int id, LeadUpdateRequest request)
         {
             var lead = await context.Leads.FindAsync(id)
                 ?? throw new NotFoundException("Lead não encontrado.");

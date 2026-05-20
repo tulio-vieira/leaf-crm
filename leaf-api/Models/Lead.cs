@@ -13,10 +13,6 @@ namespace WebAPI.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(60)]
-        public required string Name { get; set; }
-
         public string? Description { get; set; } = string.Empty;
 
         public required int BoardId { get; set; }
@@ -25,12 +21,6 @@ namespace WebAPI.Models
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public Board? Board { get; set; }
 
-        public required int CustomerId { get; set; }
-
-        [ForeignKey(nameof(CustomerId))]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Customer? Customer { get; set; }
-
         public required int ColumnIdx { get; set; }
 
         public required string Position { get; set; }
@@ -38,6 +28,15 @@ namespace WebAPI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+
+        public required int CustomerId { get; set; }
+
+        public required string CustomerName { get; set; }
+
+
+        [ForeignKey(nameof(CustomerId))]
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public Customer? Customer { get; set; }
 
         public required Guid ChangedByUserGuid { get; set; }
 
@@ -61,13 +60,12 @@ namespace WebAPI.Models
         }
 
         public void UpdateFromRequest(
-            LeadRequest r,
+            LeadUpdateRequest r,
             UserClaims c,
             bool isNewUserAssignment,
             User? userAssigned
         )
         {
-            Name = r.Name;
             Description = r.Description;
             BoardId = r.BoardId;
             ColumnIdx = r.ColumnIdx;

@@ -21,7 +21,6 @@ export interface UserOption {
 
 export interface Lead {
   id: number
-  name: string
   description?: string
   boardId: number
   board?: Board
@@ -29,12 +28,31 @@ export interface Lead {
   position: string
   createdAt: string
   modifiedAt: string
+  customerName: string
+  customerId: string
   createdByUserGuid: string
   createdByUserName: string
   changedByUserGuid: string
   changedByUserName: string
   assignedToUserGuid?: string | null
   assignedToUserName?: string | null
+}
+
+export interface Customer {
+  id: number
+  name: string
+  description?: string
+  email?: string
+  phoneNumber?: string
+  address?: string
+  company?: string
+  createdAt: string
+  modifiedAt: string
+}
+
+export interface CustomerOption {
+  id: number
+  name: string
 }
 
 export interface PagedResponse<T> {

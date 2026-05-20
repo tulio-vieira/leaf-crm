@@ -68,7 +68,7 @@ function LeadDetail() {
       {lead && (
         <Paper sx={{ p: 3 }}>
           <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{lead.name}</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{lead.customerName}</Typography>
             <Stack direction="row" spacing={1}>
               <Button
                 variant="outlined"
@@ -91,6 +91,10 @@ function LeadDetail() {
           <Divider sx={{ mb: 2 }} />
 
           <Stack spacing={1.5}>
+            <Box>
+              <Typography variant="caption" color="text.secondary">Cliente</Typography>
+              <Typography variant="body1">{lead.customerName}</Typography>
+            </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Descrição</Typography>
               <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{lead.description || '—'}</Typography>
@@ -148,7 +152,7 @@ function LeadDetail() {
       <ConfirmDialog
         open={showDelete}
         title="Excluir Lead"
-        message={`Deseja excluir o lead "${lead?.name}"? Esta ação não pode ser desfeita.`}
+        message={`Deseja excluir o lead de "${lead?.customerName}"? Esta ação não pode ser desfeita.`}
         onConfirm={handleDelete}
         onCancel={() => { setShowDelete(false); setDeleteState({}) }}
         isLoading={deleteState.isLoading}
