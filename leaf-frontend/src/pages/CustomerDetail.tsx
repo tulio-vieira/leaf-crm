@@ -16,6 +16,7 @@ import CustomerForm from '../components/Customer/CustomerForm'
 import type { Customer } from '../models/Domain'
 import type { PageState } from '../models/PageState'
 import { getCustomer, deleteCustomer } from '../services/customerService'
+import { formatPhone } from '../util/phone'
 
 function CustomerDetail() {
   const { id } = useParams<{ id: string }>()
@@ -100,7 +101,7 @@ function CustomerDetail() {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Telefone</Typography>
-              <Typography variant="body1">{customer.phoneNumber || '—'}</Typography>
+              <Typography variant="body1">{customer.phoneNumber ? formatPhone(customer.phoneNumber) : '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Endereço</Typography>

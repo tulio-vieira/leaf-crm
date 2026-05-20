@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField'
 import type { Customer } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { createCustomer, updateCustomer, type CustomerRequest } from '../../services/customerService'
+import { formatPhone } from '../../util/phone'
 
 interface Props {
   customer?: Customer
@@ -24,7 +25,7 @@ function CustomerForm({ customer, onSuccess, onCancel }: Props) {
   const [name, setName] = useState(customer?.name ?? '')
   const [description, setDescription] = useState(customer?.description ?? '')
   const [email, setEmail] = useState(customer?.email ?? '')
-  const [phoneNumber, setPhoneNumber] = useState(customer?.phoneNumber ?? '')
+  const [phoneNumber, setPhoneNumber] = useState(formatPhone(customer?.phoneNumber ?? ''))
   const [address, setAddress] = useState(customer?.address ?? '')
   const [company, setCompany] = useState(customer?.company ?? '')
 
@@ -35,21 +36,25 @@ function CustomerForm({ customer, onSuccess, onCancel }: Props) {
     setName(customer.name)
     setDescription(customer.description ?? '')
     setEmail(customer.email ?? '')
-    setPhoneNumber(customer.phoneNumber ?? '')
+    setPhoneNumber(formatPhone(customer.phoneNumber ?? ''))
     setAddress(customer.address ?? '')
     setCompany(customer.company ?? '')
   }, [customer])
 
+  const rawDigits = phoneNumber.replace(/\D/g, '')
+  const phoneError = rawDigits.length > 0 && rawDigits.length !== 10 && rawDigits.length !== 11
+  const canSubmit = !!name && !phoneError
+
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
-    if (!name) return
+    if (!canSubmit) return
     setFormState({ isLoading: true })
 
     const data: CustomerRequest = {
       name,
       description: description || undefined,
       email: email || undefined,
-      phoneNumber: phoneNumber || undefined,
+      phoneNumber: rawDigits || undefined,
       address: address || undefined,
       company: company || undefined,
     }
@@ -98,9 +103,12 @@ function CustomerForm({ customer, onSuccess, onCancel }: Props) {
           <TextField
             label="Telefone"
             value={phoneNumber}
-            onChange={e => setPhoneNumber(e.target.value)}
+            onChange={e => setPhoneNumber(formatPhone(e.target.value))}
             fullWidth
             disabled={formState.isLoading}
+            error={phoneError}
+            helperText={phoneError ? 'Telefone inválido. Use o formato: 61 94938-4830' : undefined}
+            slotProps={{ htmlInput: { inputMode: 'numeric' } }}
           />
 
           <TextField
@@ -127,7 +135,7 @@ function CustomerForm({ customer, onSuccess, onCancel }: Props) {
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={formState.isLoading || !name}
+          disabled={formState.isLoading || !canSubmit}
         >
           {formState.isLoading ? <CircularProgress size={20} color="inherit" /> : isEdit ? 'Salvar' : 'Criar'}
         </Button>
