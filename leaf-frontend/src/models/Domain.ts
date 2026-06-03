@@ -29,7 +29,7 @@ export interface Lead {
   createdAt: string
   modifiedAt: string
   customerName: string
-  customerId: string
+  customerId: number
   createdByUserGuid: string
   createdByUserName: string
   changedByUserGuid: string

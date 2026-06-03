@@ -95,6 +95,7 @@ function BoardDetail() {
         <BoardKanban
           board={boardState.data.board}
           leads={leadsState.data}
+          onLeadUpdate={() => handleRefresh()}
         />
       )}
 

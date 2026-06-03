@@ -21,6 +21,7 @@ type DropCardParams = Parameters<Required<BoardProps>['onCardMove']>[0]
 interface Props {
   board: Board
   leads: Lead[]
+  onLeadUpdate: (lead: Lead) => void
 }
 
 function buildBoardData(board: Board, leads: Lead[]): BoardData {
@@ -72,7 +73,7 @@ function buildBoardData(board: Board, leads: Lead[]): BoardData {
   return Object.fromEntries([['root', root], ...columnItems, ...cardItems]) as BoardData
 }
 
-function BoardKanban({ board, leads }: Props) {
+function BoardKanban({ board, leads, onLeadUpdate }: Props) {
   const theme = useTheme()
   const [boardData, setBoardData] = useState<BoardData>(() => buildBoardData(board, leads))
   const [reqState, setReqState] = useState<PageState<string>>({})
@@ -221,7 +222,7 @@ function BoardKanban({ board, leads }: Props) {
       {selectedLead && (
         <LeadForm
           lead={selectedLead}
-          onSuccess={() => { setSelectedLead(null) }}
+          onSuccess={() => { setSelectedLead(null); onLeadUpdate(selectedLead)}}
           onCancel={() => setSelectedLead(null)}
         />
       )}
