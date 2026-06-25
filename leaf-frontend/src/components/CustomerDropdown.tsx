@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField'
 import type { CustomerOption } from '../models/Domain'
 import { useDebounce } from '../hooks/useDebounce'
 import { searchCustomers } from '../services/customerService'
+import type { PageState } from '../models/PageState';
 
 interface Props {
   value: CustomerOption | null
@@ -12,32 +13,33 @@ interface Props {
 }
 
 function CustomerDropdown({ value, onChange, disabled }: Props) {
-  const [inputValue, setInputValue] = useState('')
-  const [options, setOptions] = useState<CustomerOption[]>(value ? [value] : [])
-  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [inputValue, setInputValue] = useState(value?.name || '')
+  const [options, setOptions] = useState<PageState<CustomerOption[]>>({data: value ? [value] : []})
 
   const debouncedInput = useDebounce(inputValue, 400)
 
   useEffect(() => {
+    if (!open) return
     let active = true
-    setLoading(true)
-    searchCustomers(debouncedInput).then(res => {
+    setOptions({isLoading: true})
+    searchCustomers(debouncedInput === value?.name ? "" : debouncedInput).then(res => {
       if (!active) return
-      setOptions(res.data ?? [])
-      setLoading(false)
+      setOptions(res)
     })
     return () => { active = false }
-  }, [debouncedInput])
+  }, [debouncedInput, open])
 
   return (
     <Autocomplete
-      options={options}
+      onOpen={() => setOpen(true)}
+      options={options.data ? options.data : []}
       getOptionLabel={opt => opt.name}
       value={value}
       inputValue={inputValue}
       onInputChange={(_, val) => setInputValue(val)}
       onChange={(_, customer) => onChange(customer)}
-      loading={loading}
+      loading={options.isLoading}
       filterOptions={x => x}
       isOptionEqualToValue={(opt, val) => opt.id === val.id}
       disabled={disabled}

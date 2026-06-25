@@ -39,6 +39,7 @@ function LeadListItem({ lead, onChanged }: Props) {
     ? lead.description.slice(0, 60) + '…'
     : (lead.description ?? '—')
 
+  // TODO: add useeffect here to grab board and pass it to leadform
   const boardName = lead.board?.name ?? String(lead.boardId)
   const createdAt = new Date(lead.createdAt).toLocaleDateString('pt-BR')
 

@@ -25,7 +25,7 @@ function LeadList({ leads, hasNextPage, onChanged }: Props) {
             <TableRow>
               <TableCell>Cliente</TableCell>
               <TableCell>Descrição</TableCell>
-              <TableCell>Quadro</TableCell>
+              <TableCell>Quadro Id</TableCell>
               <TableCell>Criado em</TableCell>
               <TableCell>Criado por</TableCell>
               <TableCell>Responsável</TableCell>

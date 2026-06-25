@@ -222,6 +222,7 @@ function BoardKanban({ board, leads, onLeadUpdate }: Props) {
       {selectedLead && (
         <LeadForm
           lead={selectedLead}
+          currBoard={board}
           onSuccess={() => { setSelectedLead(null); onLeadUpdate(selectedLead)}}
           onCancel={() => setSelectedLead(null)}
         />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
@@ -8,9 +8,10 @@ import DialogTitle from '@mui/material/DialogTitle'
 import type { Board, Lead } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { generateKeyBetween } from 'fractional-indexing'
-import { listAllBoards } from '../../services/boardService'
 import { createLead, updateLead } from '../../services/leadService'
+import { getBoard } from '../../services/boardService'
 import LeadFormFields from './LeadFormFields'
+import { Alert } from '@mui/material';
 
 interface Props {
   lead?: Lead
@@ -21,12 +22,13 @@ interface Props {
 }
 
 function validateLead(leadFields: Partial<Lead>) {
+  console.log(leadFields)
   if (
-    !leadFields.customerId ||
-    !leadFields.customerName ||
-    !leadFields.boardId ||
-    !leadFields.assignedToUserGuid ||
-    !leadFields.assignedToUserName
+    leadFields.customerId === undefined ||
+    leadFields.customerName === undefined ||
+    leadFields.boardId === undefined ||
+    leadFields.assignedToUserGuid === undefined ||
+    leadFields.assignedToUserName === undefined
   ) return false
   return leadFields as Lead
 }
@@ -34,26 +36,29 @@ function validateLead(leadFields: Partial<Lead>) {
 function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props) {
   const isEdit = lead !== undefined
 
-  const [leadFields] = useState<Partial<Lead>>(lead || {})
+  const [leadFields] = useState<Partial<Lead>>(lead ? { ...lead } : { boardId: currBoard?.id })
   const [formState, setFormState] = useState<PageState>({})
-  const [boardsState, setBoardsState] = useState<PageState<Board[]>>({ isLoading: true })
+  const [boardState, setBoardState] = useState<PageState<Board>>({})
 
   useEffect(() => {
-    if (currBoard) {
-      return setBoardsState({ data: [currBoard] })
-    }
-    listAllBoards().then(res => {
+    if (!isEdit || currBoard || lead?.board) return
+
+    setBoardState({ isLoading: true })
+    getBoard(lead!.boardId).then(res => {
       if (res.errMsg) {
-        setBoardsState({ errMsg: res.errMsg })
+        setBoardState({ errMsg: res.errMsg })
       } else {
-        setBoardsState({ data: res.data })
+        leadFields.board = res.data
+        setBoardState({ data: res.data })
       }
     })
   }, [])
 
+
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     const validatedFields = validateLead(leadFields)
+
     if (!validatedFields) return setFormState({ errMsg: "Campos obrigatórios não preenchidos" })
     setFormState({ isLoading: true })
     if (!isEdit) {
@@ -75,20 +80,26 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
     <Dialog open onClose={onCancel} fullWidth maxWidth="sm">
       <DialogTitle>{isEdit ? 'Editar Lead' : 'Novo Lead'}</DialogTitle>
       <DialogContent>
-        <LeadFormFields
-          isEdit={isEdit}
-          currBoard={currBoard}
-          leadFields={leadFields}
-          boardsState={boardsState}
-          formState={formState}
-        />
+        {boardState.isLoading
+          ? <CircularProgress sx={{ display: 'block', mx: 'auto', my: 2 }} />
+          : <>
+              {boardState.errMsg && <Alert severity="error" sx={{ mb: 1 }}>{boardState.errMsg}</Alert>}
+              <LeadFormFields
+                isEdit={isEdit}
+                currBoard={boardState.data ?? currBoard}
+                leadFields={leadFields}
+                disabled={formState.isLoading}
+              />
+              {formState.errMsg && <Alert sx={{ mt: 1 }} severity="error">{formState.errMsg}</Alert>}
+            </>
+        }
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel} disabled={formState.isLoading}>Cancelar</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={formState.isLoading || boardsState.isLoading || formState.errMsg !== undefined || boardsState.errMsg !== undefined}
+          disabled={formState.isLoading}
         >
           {formState.isLoading ? <CircularProgress size={20} color="inherit" /> : isEdit ? 'Salvar' : 'Criar'}
         </Button>
