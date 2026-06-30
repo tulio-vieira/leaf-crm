@@ -1,4 +1,5 @@
 
+using LeafAPI.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using WebAPI.Dtos;
 using WebAPI.Errors;
@@ -15,6 +16,10 @@ namespace WebAPI.Models
         public required string Name { get; set; }
 
         public string? Description { get; set; } = string.Empty;
+
+        public IntegrationSetting InfinitePaySetting { get; set; } = new IntegrationSetting();
+
+        public IntegrationSetting LoggiSetting { get; set; } = new IntegrationSetting();
 
         public List<Column> Columns { get; set; } = [];
 
