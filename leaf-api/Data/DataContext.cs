@@ -37,7 +37,15 @@ namespace WebAPI.Data
 
             modelBuilder.Entity<Integration>().UseTpcMappingStrategy();
 
-            modelBuilder.Entity<Integration>()
+            modelBuilder.Entity<InfinitePayIntegration>()
+                .OwnsOne(i => i.Webhook, wb =>
+                {
+                    wb.Property(w => w.RequestSent).HasColumnType("jsonb");
+                    wb.Property(w => w.ResponsePayload).HasColumnType("jsonb");
+                    wb.Property(w => w.PayloadReceived).HasColumnType("jsonb");
+                });
+
+            modelBuilder.Entity<LoggiIntegration>()
                 .OwnsOne(i => i.Webhook, wb =>
                 {
                     wb.Property(w => w.RequestSent).HasColumnType("jsonb");
