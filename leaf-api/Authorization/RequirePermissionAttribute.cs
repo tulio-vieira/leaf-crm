@@ -5,7 +5,7 @@ using System.Management.Automation;
 namespace WebAPI.Authorization
 {
 
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class RequirePermission : Attribute, IAuthorizationFilter
     {
         protected string permission;

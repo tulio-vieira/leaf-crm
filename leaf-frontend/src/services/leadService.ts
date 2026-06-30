@@ -88,3 +88,28 @@ export async function deleteLead(id: number): Promise<APIResponse<undefined>> {
     return { errMsg: err?.response?.data?.title ?? 'Request failed' }
   }
 }
+
+export interface LeadWithNewCustomerRequest {
+  customer: {
+    name: string
+    description?: string
+    email?: string
+    phoneNumber?: string
+    address?: string
+    company?: string
+  }
+  description?: string
+  boardId: number
+  columnIdx: number
+  position: string
+  assignedToUserGuid?: string | null
+}
+
+export async function createLeadWithNewCustomer(data: LeadWithNewCustomerRequest): Promise<APIResponse<Lead>> {
+  try {
+    const res = await backendAPI.post<Lead>('leads/with-new-customer', data)
+    return { data: res.data }
+  } catch (err: any) {
+    return { errMsg: err?.response?.data?.title ?? 'Request failed' }
+  }
+}

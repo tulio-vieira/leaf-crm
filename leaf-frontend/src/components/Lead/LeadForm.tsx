@@ -8,10 +8,11 @@ import DialogTitle from '@mui/material/DialogTitle'
 import type { Board, Lead } from '../../models/Domain'
 import type { PageState } from '../../models/PageState'
 import { generateKeyBetween } from 'fractional-indexing'
-import { createLead, updateLead } from '../../services/leadService'
+import { createLead, updateLead, createLeadWithNewCustomer } from '../../services/leadService'
 import { getBoard } from '../../services/boardService'
 import LeadFormFields from './LeadFormFields'
-import { Alert } from '@mui/material';
+import { Alert } from '@mui/material'
+import type { CustomerFields } from '../Customer/CustomerFormFields'
 
 interface Props {
   lead?: Lead
@@ -39,6 +40,9 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
   const [leadFields] = useState<Partial<Lead>>(lead ? { ...lead } : { boardId: currBoard?.id })
   const [formState, setFormState] = useState<PageState>({})
   const [boardState, setBoardState] = useState<PageState<Board>>({})
+  const [customerMode, setCustomerMode] = useState<'existing' | 'new'>('existing')
+  const [customerFields] = useState<CustomerFields>({})
+  const [customerValidationError, setCustomerValidationError] = useState<string | undefined>()
 
   useEffect(() => {
     if (!isEdit || currBoard || lead?.board) return
@@ -57,8 +61,33 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
-    const validatedFields = validateLead(leadFields)
 
+    if (!isEdit && customerMode === 'new') {
+      if (!customerFields.name) return setFormState({ errMsg: "Nome do cliente é obrigatório" })
+      if (customerValidationError) return setFormState({ errMsg: customerValidationError })
+      if (
+        leadFields.boardId === undefined ||
+        leadFields.columnIdx === undefined ||
+        leadFields.assignedToUserGuid === undefined ||
+        leadFields.assignedToUserName === undefined
+      ) return setFormState({ errMsg: "Campos obrigatórios não preenchidos" })
+
+      setFormState({ isLoading: true })
+      const highestPos = columnCursors ? columnCursors[leadFields.columnIdx] : null
+      const res = await createLeadWithNewCustomer({
+        customer: customerFields as { name: string },
+        description: leadFields.description,
+        boardId: leadFields.boardId,
+        columnIdx: leadFields.columnIdx,
+        position: generateKeyBetween(highestPos ?? null, null),
+        assignedToUserGuid: leadFields.assignedToUserGuid,
+      })
+      if (res.errMsg) return setFormState({ errMsg: res.errMsg })
+      setFormState({})
+      return onSuccess()
+    }
+
+    const validatedFields = validateLead(leadFields)
     if (!validatedFields) return setFormState({ errMsg: "Campos obrigatórios não preenchidos" })
     setFormState({ isLoading: true })
     if (!isEdit) {
@@ -89,6 +118,10 @@ function LeadForm({ lead, currBoard, columnCursors, onSuccess, onCancel }: Props
                 currBoard={boardState.data ?? currBoard}
                 leadFields={leadFields}
                 disabled={formState.isLoading}
+                customerMode={customerMode}
+                onCustomerModeChange={setCustomerMode}
+                customerFields={customerFields}
+                onCustomerValidationError={setCustomerValidationError}
               />
               {formState.errMsg && <Alert sx={{ mt: 1 }} severity="error">{formState.errMsg}</Alert>}
             </>

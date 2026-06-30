@@ -139,6 +139,37 @@ namespace WebAPI.Controllers
             return lead;
         }
 
+        [HttpPost("with-new-customer")]
+        [RequirePermission("leads:write")]
+        [RequirePermission("customers:write")]
+        public async Task<ActionResult<Lead>> CreateLeadWithNewCustomer(LeadWithNewCustomerRequest request)
+        {
+            var board = await context.Boards.FindAsync(request.BoardId)
+                ?? throw new NotFoundException("Quadro não encontrado.");
+
+            User? userAssigned = null;
+            if (request.AssignedToUserGuid is not null)
+            {
+                userAssigned = await context.Users.FindAsync(request.AssignedToUserGuid)
+                    ?? throw new NotFoundException("Usuário não encontrado.");
+            }
+
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            var customer = request.Customer.ToEntity();
+            context.Customers.Add(customer);
+            await context.SaveChangesAsync();
+
+            var lead = request.ToEntity(authService.GetUserClaims(HttpContext), userAssigned, customer);
+            lead.Validate(board);
+
+            context.Leads.Add(lead);
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return CreatedAtAction(nameof(GetLead), new { id = lead.Id }, lead);
+        }
+
         [HttpDelete("{id}")]
         [RequirePermission("leads:delete")]
         public async Task<IActionResult> DeleteLead(int id)

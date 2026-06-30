@@ -2,6 +2,36 @@ using WebAPI.Models;
 
 namespace WebAPI.Dtos
 {
+    public class LeadWithNewCustomerRequest
+    {
+        public required CustomerRequest Customer { get; set; }
+
+        public string? Description { get; set; } = string.Empty;
+
+        public required int BoardId { get; set; }
+
+        public required int ColumnIdx { get; set; }
+
+        public required string Position { get; set; }
+
+        public Guid? AssignedToUserGuid { get; set; }
+
+        public Lead ToEntity(UserClaims claims, User? userAssigned, Customer customer)
+        {
+            var leadCreate = new LeadCreateRequest
+            {
+                CustomerId = customer.Id,
+                Description = Description,
+                BoardId = BoardId,
+                ColumnIdx = ColumnIdx,
+                Position = Position,
+                AssignedToUserGuid = AssignedToUserGuid,
+            };
+            return leadCreate.ToEntity(claims, userAssigned, customer);
+        }
+    }
+
+
     public class LeadUpdateRequest {
         public string? Description { get; set; } = string.Empty;
 
