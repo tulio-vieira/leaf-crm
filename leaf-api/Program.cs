@@ -34,6 +34,8 @@ namespace WebAPI
                     builder.Configuration.GetRequiredSection(nameof(JWTOptions)));
             builder.Services.Configure<PaginationOptions>(
                 builder.Configuration.GetRequiredSection(nameof(PaginationOptions)));
+            builder.Services.Configure<InfinitePayOptions>(
+                builder.Configuration.GetRequiredSection(nameof(InfinitePayOptions)));
 
             var siteUrl = builder.Configuration.GetRequiredValue("SiteUrl");
             var frontendUrl = builder.Configuration.GetRequiredValue("FrontendUrl");
@@ -107,6 +109,7 @@ namespace WebAPI
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddHttpClient("mailgun");
             builder.Services.AddHttpClient("mailtrap");
+            builder.Services.AddHttpClient("infinitepay");
             var emailService = builder.Configuration.GetValue<string>("EmailService");
             builder.Services.AddScoped<INotificationService>(emailService switch
             {

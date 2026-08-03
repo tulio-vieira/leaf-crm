@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Errors;
 using WebAPI.Models;
+
 
 namespace LeafAPI.Interfaces
 {
+    [NotMapped]
     public abstract class Integration
     {
         [Key]
@@ -44,5 +47,11 @@ namespace LeafAPI.Interfaces
         public int DestinationColumn { get; set; } = 0;
         
         public bool AllowBypassRules { get; set; } = false;
+
+        public void Validate(List<Column> columns)
+        {
+            if (DestinationColumn < 0 || DestinationColumn >= columns.Capacity)
+                throw new ServiceException("Coluna de destino inválida.");
+        }
     }
 }

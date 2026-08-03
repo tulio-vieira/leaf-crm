@@ -1,4 +1,3 @@
-using LeafAPI.Interfaces;
 using LeafAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
@@ -35,8 +34,8 @@ namespace WebAPI.Data
                 .Property(l => l.Position)
                 .UseCollation("C");
 
-            modelBuilder.Entity<Integration>().UseTpcMappingStrategy();
-
+            // Integration base is [NotMapped] — each concrete type is an independent entity
+            // with its own table. This avoids EF's TPH constraint on JSON-mapped owned types.
             modelBuilder.Entity<InfinitePayIntegration>()
                 .OwnsOne(i => i.Webhook, wb =>
                 {
@@ -44,6 +43,9 @@ namespace WebAPI.Data
                     wb.Property(w => w.ResponsePayload).HasColumnType("jsonb");
                     wb.Property(w => w.PayloadReceived).HasColumnType("jsonb");
                 });
+
+            modelBuilder.Entity<InfinitePayIntegration>()
+                .OwnsMany(i => i.Items, builder => builder.ToJson());
 
             modelBuilder.Entity<LoggiIntegration>()
                 .OwnsOne(i => i.Webhook, wb =>

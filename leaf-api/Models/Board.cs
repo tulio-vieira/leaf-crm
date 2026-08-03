@@ -31,12 +31,16 @@ namespace WebAPI.Models
             {
                 if (!nameSet.Add(c.Name)) throw new ServiceException("Quadro contém colunas com nomes repetidos.");
             }
+            InfinitePaySetting.Validate(Columns);
+            LoggiSetting.Validate(Columns);
         }
 
         public void UpdateFromRequest(BoardUpdateRequest r)
         {
             Name = r.Name;
             Description = r.Description;
+            InfinitePaySetting = r.InfinitePaySetting;
+            LoggiSetting = r.LoggiSetting;
         }
     }
 

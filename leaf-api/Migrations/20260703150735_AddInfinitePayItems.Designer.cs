@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebAPI.Data;
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace LeafAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260703150735_AddInfinitePayItems")]
+    partial class AddInfinitePayItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace LeafAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LeafAPI.Models.InfinitePayIntegration", b =>
+            modelBuilder.Entity("LeafAPI.Interfaces.Integration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,32 +36,10 @@ namespace LeafAPI.Migrations
                     b.Property<int>("BoardId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("LeadId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Link")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BoardId");
-
-                    b.HasIndex("LeadId");
-
-                    b.ToTable("InfinitePayIntegrations");
-                });
-
-            modelBuilder.Entity("LeafAPI.Models.LoggiIntegration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BoardId")
-                        .HasColumnType("integer");
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
 
                     b.Property<int>("LeadId")
                         .HasColumnType("integer");
@@ -69,11 +50,11 @@ namespace LeafAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BoardId");
+                    b.ToTable("Integration");
 
-                    b.HasIndex("LeadId");
+                    b.HasDiscriminator().HasValue("Integration");
 
-                    b.ToTable("LoggiIntegrations");
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("WebAPI.Models.Board", b =>
@@ -354,104 +335,31 @@ namespace LeafAPI.Migrations
 
             modelBuilder.Entity("LeafAPI.Models.InfinitePayIntegration", b =>
                 {
-                    b.HasOne("WebAPI.Models.Board", "Board")
-                        .WithMany()
-                        .HasForeignKey("BoardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("LeafAPI.Interfaces.Integration");
 
-                    b.HasOne("WebAPI.Models.Lead", "Lead")
-                        .WithMany()
-                        .HasForeignKey("LeadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasIndex("BoardId");
 
-                    b.OwnsOne("LeafAPI.Interfaces.Webhook", "Webhook", b1 =>
-                        {
-                            b1.Property<int>("InfinitePayIntegrationId")
-                                .HasColumnType("integer");
+                    b.HasIndex("LeadId");
 
-                            b1.Property<string>("PayloadReceived")
-                                .HasColumnType("jsonb");
-
-                            b1.Property<DateTime>("PayloadReceivedAt")
-                                .HasColumnType("timestamp with time zone");
-
-                            b1.Property<string>("RequestSent")
-                                .IsRequired()
-                                .HasColumnType("jsonb");
-
-                            b1.Property<string>("ResponsePayload")
-                                .IsRequired()
-                                .HasColumnType("jsonb");
-
-                            b1.Property<int>("ResponseStatus")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("InfinitePayIntegrationId");
-
-                            b1.ToTable("InfinitePayIntegrations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("InfinitePayIntegrationId");
-                        });
-
-                    b.OwnsMany("LeafAPI.Models.Item", "Items", b1 =>
-                        {
-                            b1.Property<int>("InfinitePayIntegrationId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("__synthesizedOrdinal")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Description")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PriceCents")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Quantity")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("InfinitePayIntegrationId", "__synthesizedOrdinal");
-
-                            b1.ToTable("InfinitePayIntegrations");
-
-                            b1.ToJson("Items");
-
-                            b1.WithOwner()
-                                .HasForeignKey("InfinitePayIntegrationId");
-                        });
-
-                    b.Navigation("Board");
-
-                    b.Navigation("Items");
-
-                    b.Navigation("Lead");
-
-                    b.Navigation("Webhook")
-                        .IsRequired();
+                    b.HasDiscriminator().HasValue("InfinitePayIntegration");
                 });
 
             modelBuilder.Entity("LeafAPI.Models.LoggiIntegration", b =>
                 {
-                    b.HasOne("WebAPI.Models.Board", "Board")
-                        .WithMany()
-                        .HasForeignKey("BoardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("LeafAPI.Interfaces.Integration");
 
-                    b.HasOne("WebAPI.Models.Lead", "Lead")
-                        .WithMany()
-                        .HasForeignKey("LeadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasIndex("BoardId");
 
+                    b.HasIndex("LeadId");
+
+                    b.HasDiscriminator().HasValue("LoggiIntegration");
+                });
+
+            modelBuilder.Entity("LeafAPI.Interfaces.Integration", b =>
+                {
                     b.OwnsOne("LeafAPI.Interfaces.Webhook", "Webhook", b1 =>
                         {
-                            b1.Property<int>("LoggiIntegrationId")
+                            b1.Property<int>("IntegrationId")
                                 .HasColumnType("integer");
 
                             b1.Property<string>("PayloadReceived")
@@ -471,17 +379,13 @@ namespace LeafAPI.Migrations
                             b1.Property<int>("ResponseStatus")
                                 .HasColumnType("integer");
 
-                            b1.HasKey("LoggiIntegrationId");
+                            b1.HasKey("IntegrationId");
 
-                            b1.ToTable("LoggiIntegrations");
+                            b1.ToTable("Integration");
 
                             b1.WithOwner()
-                                .HasForeignKey("LoggiIntegrationId");
+                                .HasForeignKey("IntegrationId");
                         });
-
-                    b.Navigation("Board");
-
-                    b.Navigation("Lead");
 
                     b.Navigation("Webhook")
                         .IsRequired();
@@ -603,6 +507,75 @@ namespace LeafAPI.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("LeafAPI.Models.InfinitePayIntegration", b =>
+                {
+                    b.HasOne("WebAPI.Models.Board", "Board")
+                        .WithMany()
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.Lead", "Lead")
+                        .WithMany()
+                        .HasForeignKey("LeadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("LeafAPI.Models.Item", "Items", b1 =>
+                        {
+                            b1.Property<int>("InfinitePayIntegrationId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<int>("PriceCents")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("InfinitePayIntegrationId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Integration");
+
+                            b1.ToJson("Items");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InfinitePayIntegrationId");
+                        });
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Items");
+
+                    b.Navigation("Lead");
+                });
+
+            modelBuilder.Entity("LeafAPI.Models.LoggiIntegration", b =>
+                {
+                    b.HasOne("WebAPI.Models.Board", "Board")
+                        .WithMany()
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.Lead", "Lead")
+                        .WithMany()
+                        .HasForeignKey("LeadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Lead");
                 });
 #pragma warning restore 612, 618
         }
